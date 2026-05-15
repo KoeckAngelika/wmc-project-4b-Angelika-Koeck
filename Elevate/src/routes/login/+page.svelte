@@ -26,6 +26,14 @@
         <button>
             Anmelden
         </button>
+
+		<p class="register-text">
+			Noch kein Konto?
+
+			<a href="/register">
+				Registrieren
+			</a>
+		</p>
     </div>
 </div>
 
@@ -279,6 +287,19 @@
 			font-size: 13px;
 		}
 
+		.register-text a {
+			color: #818cf8;
+			
+			font-weight: 700;
+
+			text-decoration: none;
+
+			margin-left: 4px;
+		}
+
+		.register-text a:hover {
+			text-decoration: underline;
+		}
 	}
 
 </style>
