@@ -5,15 +5,17 @@
 <div class="page">
     <div class="card">
 
-        <h1>Willkommen zurück</h1>
-        <p class="subtitle">
-            melde dich an um weiter zu trainieren
-        </p>
+		<img
+			src="/logo.png"
+			alt="Elevate Logo"
+			class="logo"
+		/>
 
         <div class="input-group">
             <label>Benutzername</label>
             <input type="text" placeholder="Username">
         </div>
+
         <div class="input-group">
             <label>Passwort</label>
             <input type="password" placeholder="*******">
@@ -34,9 +36,9 @@
 				Registrieren
 			</a>
 		</p>
+
     </div>
 </div>
-
 
 <style>
 
@@ -90,9 +92,9 @@
 
 	.card {
 		width: 100%;
-		max-width: 430px;
+		max-width: 700px;
 
-		padding: 60px 50px;
+		padding: 25px 40px;
 
 		background: rgba(255,255,255,0.9);
 
@@ -114,36 +116,20 @@
 		box-sizing: border-box;
 	}
 
-	h1 {
-		margin: 0;
+	.logo {
+		width: 100%;
 
-		font-size: 48px;
-		font-weight: 800;
+		margin: -70px auto -70px auto;
+		display: block;
 
-		color: #111827;
-
-		text-align: center;
-
-		line-height: 1.1;
-	}
-
-	.subtitle {
-		margin-top: 14px;
-		margin-bottom: 50px;
-
-		text-align: center;
-
-		color: #6b7280;
-
-		font-size: 15px;
-		line-height: 1.5;
+		object-fit: contain;
 	}
 
 	.input-group {
 		display: flex;
 		flex-direction: column;
 
-		margin-bottom: 26px;
+		margin-bottom: 18px;
 	}
 
 	label {
@@ -188,8 +174,8 @@
 	}
 
 	.forgot {
-		margin-top: -5px;
-		margin-bottom: 30px;
+		margin-top: -2px;
+		margin-bottom: 20px;
 
 		text-align: right;
 
@@ -231,17 +217,41 @@
 		transform: scale(0.98);
 	}
 
+	.register-text {
+		margin-top: 16px;
+
+		text-align: center;
+
+		font-size: 14px;
+
+		color: #6b7280;
+	}
+
+	.register-text a {
+		color: #818cf8;
+
+		font-weight: 700;
+
+		text-decoration: none;
+
+		margin-left: 4px;
+	}
+
+	.register-text a:hover {
+		text-decoration: underline;
+	}
+
 	/* Tablet */
 
 	@media (max-width: 768px) {
 
 		.card {
-			max-width: 500px;
-			padding: 50px 35px;
+			max-width: 560px;
+			padding: 28px 28px;
 		}
 
-		h1 {
-			font-size: 40px;
+		.logo {
+			margin-bottom: 18px;
 		}
 
 	}
@@ -255,17 +265,8 @@
 		}
 
 		.card {
-			padding: 38px 24px;
+			padding: 24px 18px;
 			border-radius: 26px;
-		}
-
-		h1 {
-			font-size: 32px;
-		}
-
-		.subtitle {
-			font-size: 14px;
-			margin-bottom: 38px;
 		}
 
 		label {
@@ -287,19 +288,10 @@
 			font-size: 13px;
 		}
 
-		.register-text a {
-			color: #818cf8;
-			
-			font-weight: 700;
-
-			text-decoration: none;
-
-			margin-left: 4px;
+		.logo {
+			margin-bottom: 18px;
 		}
 
-		.register-text a:hover {
-			text-decoration: underline;
-		}
 	}
 
 </style>
