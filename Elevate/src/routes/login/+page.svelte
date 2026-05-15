@@ -117,9 +117,9 @@
 	}
 
 	.logo {
-		width: 100%;
+		width: 70%;
 
-		margin: -70px auto -70px auto;
+		margin: 20px auto 25px auto;	
 		display: block;
 
 		object-fit: contain;
@@ -251,7 +251,7 @@
 		}
 
 		.logo {
-			margin-bottom: 18px;
+			margin-bottom: 16px;
 		}
 
 	}
@@ -289,7 +289,7 @@
 		}
 
 		.logo {
-			margin-bottom: 18px;
+			margin-bottom: 16px;
 		}
 
 	}
