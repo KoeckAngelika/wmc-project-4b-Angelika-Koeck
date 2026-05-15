@@ -12,17 +12,23 @@
 		/>
 
         <div class="input-group">
+            <!-- svelte-ignore a11y_label_has_associated_control -->
             <label>Benutzername</label>
             <input type="text" placeholder="Username">
         </div>
 
         <div class="input-group">
+            <!-- svelte-ignore a11y_label_has_associated_control -->
             <label>Passwort</label>
             <input type="password" placeholder="*******">
+			
+            <p class="passwort-text">Mindestens 8 Zeichen, inklusive Zahlen und Sonderzeichen</p>
         </div>
 
         <p class="forgot">
-            Passwort vergessen?
+			<a href="/passwort-ändern">
+            	Passwort vergessen?
+			</a>
         </p>
 
         <button>
@@ -61,33 +67,6 @@
 
 		padding: 20px;
 		box-sizing: border-box;
-	}
-
-	.background-circle {
-		position: absolute;
-		border-radius: 999px;
-		filter: blur(60px);
-		z-index: 0;
-	}
-
-	.background-circle.top {
-		width: 320px;
-		height: 320px;
-
-		background: rgba(165,180,252,0.35);
-
-		top: -100px;
-		right: -100px;
-	}
-
-	.background-circle.bottom {
-		width: 420px;
-		height: 420px;
-
-		background: rgba(221,214,254,0.3);
-
-		bottom: -180px;
-		left: -140px;
 	}
 
 	.card {
@@ -173,21 +152,6 @@
 		color: #9ca3af;
 	}
 
-	.forgot {
-		margin-top: -2px;
-		margin-bottom: 20px;
-
-		text-align: right;
-
-		font-size: 14px;
-
-		color: #818cf8;
-
-		font-weight: 600;
-
-		cursor: pointer;
-	}
-
 	button {
 		height: 62px;
 
@@ -240,6 +204,17 @@
 	.register-text a:hover {
 		text-decoration: underline;
 	}
+
+	
+    .passwort-text{
+        margin-top: 16px;
+
+		text-align: left;
+
+		font-size: 14px;
+
+		color: #6b7280;
+    }
 
 	/* Tablet */
 

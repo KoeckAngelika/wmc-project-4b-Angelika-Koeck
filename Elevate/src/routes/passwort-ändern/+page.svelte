@@ -13,36 +13,32 @@
 
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label>E-Mail</label>
-            <input type="text" placeholder="test@user">
+            <label>E-Mail-Adresse</label>
+            <input type="text" placeholder="E-Mail">
         </div>
 
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label>E-Benutzername</label>
-            <input type="text" placeholder="User1234">
-        </div>
-
-        <div class="input-group">
-            <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label>Passwort</label>
+            <label>Neues Passwort</label>
             <input type="password" placeholder="*******">
             <p class="passwort-text">Mindestens 8 Zeichen, inklusive Zahlen und Sonderzeichen</p>
         </div>
-
+        
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label>Persöhnliche Daten</label>
-            <div class="personal-data">
-                <input type="date" placeholder="Alter" />
-                <input min="30" max="300" type="number" placeholder="Größe in cm" />
-                <input min="10" type="number" placeholder="Gewicht in kg" />
-            </div>
+            <label>Neues Passwort wiederholen</label>
+            <input type="password" placeholder="*******">
         </div>
 
         <button>
-            Registrieren
+            Passwort ändern
         </button>
+
+		<p class="register-text">
+			<a href="/register">
+				Zurück zum Anmelden
+			</a>
+		</p>
 
     </div>
 </div>
@@ -182,17 +178,15 @@
 		transform: scale(0.98);
 	}
 
-    .personal-data {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 18px;
-        width: 100%;
-    }
+	.register-text {
+		margin-top: 16px;
 
-    .personal-data input {
-        width: 100%;
-        box-sizing: border-box;
-    }
+		text-align: center;
+
+		font-size: 14px;
+
+		color: #6b7280;
+	}
 
     .passwort-text{
         margin-top: 16px;
@@ -204,13 +198,23 @@
 		color: #6b7280;
     }
 
+	.register-text a {
+		color: #818cf8;
+
+		font-weight: 700;
+
+		text-decoration: none;
+
+		margin-left: 4px;
+	}
+
+	.register-text a:hover {
+		text-decoration: underline;
+	}
+
 	/* Tablet */
 
 	@media (max-width: 768px) {
-
-        .personal-data {
-            grid-template-columns: 1fr;
-        }
 
 		.card {
 			max-width: 560px;
@@ -226,10 +230,6 @@
 	/* Mobile */
 
 	@media (max-width: 480px) {
-
-        .personal-data {
-			grid-template-columns: 1fr;
-		}
 
 		.page {
 			padding: 16px;
