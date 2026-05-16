@@ -1,5 +1,10 @@
 <script>
+	import { goto } from '$app/navigation';
 
+
+	function goTodashboard(){
+		goto('/dashboard');
+	}
 </script>
 
 <div class="page">
@@ -31,7 +36,7 @@
 			</a>
         </p>
 
-        <button>
+        <button onclick={goTodashboard}>
             Anmelden
         </button>
 
