@@ -1,8 +1,6 @@
-
 <script>
 	import { goto } from '$app/navigation';
 
-	//dummyDaten
 	const tasks = [
 		{
 			name: '20 Minuten Joggen',
@@ -27,6 +25,7 @@
 
 <div class="page">
 	<nav class="navbar">
+		
 		<img
 			src="/logo.png"
 			alt="Elevate Logo"
@@ -125,72 +124,100 @@
 	}
 
 	.navbar {
-		height: 80px;
-		background: white;
-		border: 1px solid #e5e7eb;
-		border-radius: 28px;
-		padding: 0 35px;
-		display: flex;
-		align-items: center;
-		align-content: center;
-		justify-content: flex-start;
-	}
+	height: 90px;
+	background: rgba(255,255,255,0.75);
+	backdrop-filter: blur(16px);
 
+	border: 1px solid #e5e7eb;
+	border-radius: 30px;
 
-	.logo {
+	padding: 0 30px;
 
-		margin: 20px auto 25px auto;	
-		display: block;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 
-		object-fit: contain;
+	box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+}
 
-		width: 230px;
-		margin-left: 10px;
-	}
+.logo {
+	width: 220px;
+	object-fit: contain;
+	display: block;
+}
 
-	.nav-links {
-		display: flex;
-		gap: 50px;
-		align-items: center;
-		color: #6b7280;
-		font-size: 14px;
-	}
+.nav-links {
+	display: flex;
+	align-items: center;
+	gap: 18px;
 
-	.active {
-		background: #e0e7ff;
-		padding: 12px 24px;
-		border-radius: 14px;
-		color: #4f46e5;
-		font-weight: 600;
-	}
+	margin-left: 40px;
+}
 
-	.nav-right {
-		display: flex;
-		align-items: center;
-		gap: 18px;
-	}
+.nav-links div {
+	padding: 12px 22px;
+	border-radius: 16px;
 
-	.settings {
-		width: 42px;
-		height: 42px;
-		border-radius: 14px;
-		background: #f3f4f6;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
+	font-size: 15px;
+	font-weight: 500;
+	color: #6b7280;
 
-	.profile {
-		width: 44px;
-		height: 44px;
-		border-radius: 50%;
-		background: #c7d2fe;
-		color: #3730a3;
-		font-weight: 700;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.nav-links div:hover {
+	background: #f3f4f6;
+	color: #111827;
+}
+
+.active {
+	background: #e0e7ff;
+	color: #4f46e5 !important;
+	font-weight: 700 !important;
+}
+
+.nav-right {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+
+	margin-left: auto;
+}
+
+.settings,
+.profile {
+	width: 46px;
+	height: 46px;
+
+	border-radius: 16px;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	font-weight: 700;
+
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.settings {
+	background: #f3f4f6;
+}
+
+.settings:hover {
+	background: #e5e7eb;
+}
+
+.profile {
+	background: #c7d2fe;
+	color: #3730a3;
+}
+
+.profile:hover {
+	transform: scale(1.05);
+}
 
 	.hero {
 		margin-top: 55px;
@@ -426,4 +453,3 @@
 		}
 	}
 </style>
-```
