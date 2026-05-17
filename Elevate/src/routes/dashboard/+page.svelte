@@ -1,6 +1,19 @@
 <script>
 	import { goto } from '$app/navigation';
 
+	
+	function goToChat(){
+		goto('/chat');
+	}
+	
+	function gotToStatistik(){
+		goto('/statistik');
+	}
+	
+	function goToSettings(){
+		goto('/settings');
+	}
+
 	const tasks = [
 		{
 			name: '20 Minuten Joggen',
@@ -34,7 +47,7 @@
 
 		<div class="nav-links">
 			<div class="active">Dashboard</div>
-			<div>Chat</div>
+			<div on:click={goToChat}>Chat</div>
 			<div>Statistik</div>
 		</div>
 
