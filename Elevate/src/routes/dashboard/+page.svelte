@@ -47,8 +47,8 @@
 
 		<div class="nav-links">
 			<div class="active">Dashboard</div>
-			<div on:click={goToChat}>Chat</div>
-			<div>Statistik</div>
+			<div onclick={goToChat}>Chat</div>
+			<div onclick={gotToStatistik}>Statistik</div>
 		</div>
 
 		<div class="nav-right">
@@ -56,6 +56,7 @@
 			<div class="profile">A</div>
 		</div>
 	</nav>
+
 
 	<section class="hero">
 		<h1>Guten Morgen, Angelika</h1>

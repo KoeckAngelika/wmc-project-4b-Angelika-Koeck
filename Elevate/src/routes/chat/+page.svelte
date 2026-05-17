@@ -1,5 +1,6 @@
 <script>
 
+	import { goto } from '$app/navigation';
 
 	function goToDashboard(){
 		goto('/dashboard');
