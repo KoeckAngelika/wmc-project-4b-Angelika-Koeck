@@ -52,7 +52,7 @@
 		</div>
 
 		<div class="nav-right">
-			<div class="settings">⚙</div>
+			<div onclick={goToSettings} class="settings">⚙</div>
 			<div class="profile">A</div>
 		</div>
 	</nav>
