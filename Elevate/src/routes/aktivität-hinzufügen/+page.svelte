@@ -5,20 +5,35 @@
 
 	let unit = 'Minuten';
 
-    const preview = $derived(
-        `${duration || '30'} ${unit} ${activity || 'Joggen'} · ${repeat || '10 mal'}`
-    );
+	const preview = $derived(
+		`${duration || '30'} ${unit} ${activity || 'Joggen'} · ${repeat || '10 mal'}`
+	);
+
+	function addActivity() {
+		console.log({
+			activity,
+			duration,
+			repeat,
+			unit
+		});
+	}
+
+	function cancel() {
+		activity = '';
+		duration = '';
+		repeat = '';
+	}
 </script>
 
 <div class="overlay">
 
 	<div class="modal">
 
-		<h1>Aktivität hinzufügen</h1>
-
-		<p class="subtitle">
-			erstelle eine neue Aufgabe
-		</p>
+		<img
+			src="/logo.png"
+			alt="Elevate Logo"
+			class="logo"
+		/>
 
 		<!-- Aktivität -->
 		<div class="input-group">
@@ -46,7 +61,10 @@
 					placeholder="30"
 				/>
 
-				<button class="unit-btn">
+				<button
+					class="unit-btn"
+					type="button"
+				>
 					{unit}
 				</button>
 
@@ -81,11 +99,17 @@
 		<!-- Buttons -->
 		<div class="buttons">
 
-			<button class="cancel-btn">
+			<button
+				class="cancel-btn"
+				on:click={cancel}
+			>
 				Abbrechen
 			</button>
 
-			<button class="add-btn">
+			<button
+				class="add-btn"
+				on:click={addActivity}
+			>
 				Hinzufügen
 			</button>
 
@@ -110,66 +134,57 @@
 		align-items: center;
 		justify-content: center;
 
-		padding: 40px 20px;
+		padding: 30px;
 	}
 
 	.modal {
 		width: 100%;
-		max-width: 600px;
+		max-width: 640px;
 
 		background: white;
 
-		border-radius: 36px;
+		border-radius: 38px;
 
-		padding: 60px;
+		padding: 58px 58px 46px;
 
-		border: 1px solid #e5e7eb;
+		border: 1px solid #ececec;
 
 		box-sizing: border-box;
 	}
 
-	h1 {
-		text-align: center;
+	.logo {
+        width: 400px;
+        object-fit: contain;
 
-		font-size: 42px;
+        display: block;
 
-		margin: 0;
-
-		color: #111827;
-	}
-
-	.subtitle {
-		text-align: center;
-
-		color: #6b7280;
-
-		margin-top: 14px;
-		margin-bottom: 60px;
-	}
+        margin:
+            0 auto 12px auto;
+    }
 
 	.input-group {
 		display: flex;
 		flex-direction: column;
 
-		margin-bottom: 42px;
+		margin-top: 34px;
 	}
 
 	label {
-		font-size: 15px;
-		font-weight: 600;
+		font-size: 16px;
+		font-weight: 700;
 
-		margin-bottom: 16px;
+		color: #1e3a5f;
 
-		color: #374151;
+		margin-bottom: 14px;
 	}
 
 	input {
-		height: 60px;
+		height: 62px;
 
 		border: none;
 		outline: none;
 
-		border-radius: 18px;
+		border-radius: 20px;
 
 		background: #f3f4f6;
 
@@ -178,6 +193,14 @@
 		font-size: 15px;
 
 		box-sizing: border-box;
+
+		color: #374151;
+
+		transition: 0.2s;
+	}
+
+	input::placeholder {
+		color: #6b7280;
 	}
 
 	input:focus {
@@ -198,34 +221,42 @@
 
 	.unit-btn {
 		width: 220px;
-		height: 60px;
+		height: 62px;
 
 		border: none;
 
-		border-radius: 18px;
+		border-radius: 20px;
 
-		background: #eef2ff;
+		background: #e5e9ff;
 
 		color: #4f46e5;
 
 		font-size: 15px;
-		font-weight: 600;
+		font-weight: 700;
+
+		cursor: pointer;
+
+		transition: 0.2s;
+	}
+
+	.unit-btn:hover {
+		transform: translateY(-2px);
 	}
 
 	.preview {
-		height: 80px;
+		height: 78px;
 
-		background: #eef2ff;
+		background: #e5e9ff;
 
 		border-radius: 22px;
 
 		display: flex;
 		align-items: center;
 
-		padding: 0 40px;
+		padding: 0 34px;
 
-		font-size: 20px;
-		font-weight: 600;
+		font-size: 18px;
+		font-weight: 700;
 
 		color: #111827;
 
@@ -234,23 +265,21 @@
 
 	.buttons {
 		display: flex;
-		justify-content: space-between;
-
 		gap: 24px;
 
-		margin-top: 20px;
+		margin-top: 44px;
 	}
 
 	.buttons button {
 		flex: 1;
 
-		height: 58px;
+		height: 62px;
 
 		border: none;
 
-		border-radius: 18px;
+		border-radius: 20px;
 
-		font-size: 15px;
+		font-size: 16px;
 		font-weight: 700;
 
 		cursor: pointer;
@@ -264,7 +293,7 @@
 	}
 
 	.add-btn {
-		background: #a5b4fc;
+		background: #9aa7f4;
 		color: #111827;
 	}
 
@@ -275,7 +304,11 @@
 	@media (max-width: 700px) {
 
 		.modal {
-			padding: 32px;
+			padding: 30px;
+		}
+
+		.logo {
+			width: 180px;
 		}
 
 		.duration-row {
