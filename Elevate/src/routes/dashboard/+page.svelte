@@ -14,6 +14,10 @@
 		goto('/settings');
 	}
 
+	function goToCreateActivity(){
+		goto('/aktivität-hinzufügen');
+	}
+
 	const tasks = [
 		{
 			name: '20 Minuten Joggen',
@@ -103,7 +107,7 @@
 			</div>
 
 			<div class="buttons">
-				<button class="add">Hinzufügen</button>
+				<button onclick={goToCreateActivity} class="add">Hinzufügen</button>
 				<button class="edit">Bearbeiten</button>
 				<button class="delete">Löschen</button>
 			</div>
