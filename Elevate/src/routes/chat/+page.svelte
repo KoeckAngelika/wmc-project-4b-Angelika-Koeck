@@ -33,29 +33,72 @@
             ai: true
         }
     ];
+    let mobileMenu = $state(false);
 </script>
 
 <div class="page">
 
     <nav class="navbar">
 		
-		<img
-			src="/logo.png"
-			alt="Elevate Logo"
-			class="logo"
-		/>
+        <img
+            src="/logo.png"
+            alt="Elevate Logo"
+            class="logo"
+        />
 
-		<div class="nav-links">
-			<div onclick={goToDashboard}>Dashboard</div>
-			<div class="active">Chat</div>
-			<div onclick={gotToStatistik}>Statistik</div>
-		</div>
+        <button
+            class="burger"
+            onclick={() => mobileMenu = !mobileMenu}
+        >
+            ☰
+        </button>
 
-		<div class="nav-right">
-			<div onclick={goToSettings} class="settings">⚙</div>
-			<div class="chat-profile">A</div>
-		</div>
-	</nav>
+        <div class:open={mobileMenu} class="nav-links">
+
+            <button
+                onclick={() => {
+                    goToDashboard();
+                    mobileMenu = false;
+                }}
+            >
+                Dashboard
+            </button>
+
+            <button
+                class="active"
+                onclick={() => {
+                    mobileMenu = false;
+                }}
+            >
+                Chat
+            </button>
+
+            <button
+                onclick={() => {
+                    gotToStatistik();
+                    mobileMenu = false;
+                }}
+            >
+                Statistik
+            </button>
+
+            <button
+                onclick={() => {
+                    goToSettings()
+                    mobileMenu = false;
+                }}
+            >
+                Einstellungen
+            </button>
+
+        </div>
+
+        <div class="nav-right">
+            <div onclick={goToSettings} class="settings">⚙</div>
+            <div class="chat-profile">A</div>
+        </div>
+
+    </nav>
 
     <div class="content">
 
@@ -118,17 +161,35 @@
 
 
 <style>
-	:global(body) {
-		margin: 0;
-		font-family: Inter, sans-serif;
-		background: #f5f5f7;
-	}
+	:global(*) {
+        box-sizing: border-box;
+    }
+
+    :global(html, body) {
+        margin: 0;
+        padding: 0;
+
+        width: 100%;
+        min-height: 100%;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        font-family: Inter, sans-serif;
+        background: #f5f5f7;
+    }
 
 	.page {
-		padding: 40px 70px;
-		min-height: 100vh;
-		box-sizing: border-box;
-	}
+        padding: 40px 70px;
+        min-height: 100vh;
+
+        width: 100%;
+        max-width: 100%;
+
+        box-sizing: border-box;
+
+        overflow-x: hidden;
+    }
 
 	.navbar {
         height: 90px;
@@ -154,28 +215,63 @@
     }
 
     .nav-links {
-        display: flex;
-        align-items: center;
-        gap: 18px;
+        position: absolute;
 
-        margin-left: 40px;
+        top: 82px;
+        right: 0;
+
+        left: auto;
+
+        width: 190px;
+
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(18px);
+
+        border: 1px solid #e5e7eb;
+        border-radius: 24px;
+
+        padding: 14px;
+
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+        z-index: 9999;
+
+        margin-left: 0;
     }
 
-    .nav-links div {
-        padding: 12px 22px;
+    .nav-links.open {
+        display: flex;
+    }
+
+    .nav-links button {
+        width: 100%;
+
+        padding: 14px;
+
+        border: none;
         border-radius: 16px;
 
+        background: transparent;
+
+        text-align: left;
+
         font-size: 15px;
-        font-weight: 500;
-        color: #6b7280;
+        font-weight: 600;
+
+        color: #374151;
 
         cursor: pointer;
+
         transition: 0.2s;
     }
 
-    .nav-links div:hover {
-        background: #f3f4f6;
-        color: #111827;
+    .nav-links button:hover {
+        background: #eef2ff;
+        color: #4f46e5;
     }
 
     .active {
@@ -233,6 +329,8 @@
         display: grid;
         grid-template-columns: 320px 1fr;
         gap: 28px;
+
+        width: 100%;
     }
 
     /* SIDEBAR */
@@ -246,7 +344,8 @@
 
         padding: 28px;
 
-        height: 760px;
+        min-height: 760px;
+
         box-sizing: border-box;
 
         box-shadow: 0 12px 30px rgba(0,0,0,0.04);
@@ -339,7 +438,7 @@
         border: 1px solid #e5e7eb;
         border-radius: 34px;
 
-        height: 760px;
+        min-height: 760px;
 
         display: flex;
         flex-direction: column;
@@ -505,38 +604,101 @@
         }
     }
 
+    .burger {
+        display: none;
+    }
+
     @media (max-width: 700px) {
+
         .page {
             padding: 20px;
         }
 
-        .nav-links {
-            display: none;
+        .navbar {
+            position: relative;
+            z-index: 10000;
         }
 
-        .content {
-            gap: 20px;
+        .logo {
+            width: 150px;
+        }
+
+        .burger {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 46px;
+            height: 46px;
+
+            border: none;
+            border-radius: 16px;
+
+            background: #eef2ff;
+
+            color: #4f46e5;
+            font-size: 24px;
+
+            cursor: pointer;
+        }
+
+        .nav-links {
+            position: absolute;
+
+            top: 82px;
+            right: 0;
+
+            left: auto;
+
+            width: 190px;
+
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(18px);
+
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+
+            padding: 14px;
+
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+            z-index: 99999;
+        }
+
+        .nav-links.open {
+            display: flex;
+        }
+
+        .nav-links button {
+            width: 100%;
+            text-align: center;
+        }
+
+        .nav-right {
+            display: none;
         }
 
         .sidebar,
         .chat-box {
-            border-radius: 28px;
+            width: 100%;
+            min-height: auto;
         }
 
-        .messages {
-            padding: 22px;
-        }
-
-        .chat-header {
-            padding: 22px;
+        .content {
+            grid-template-columns: 1fr;
         }
 
         .input-area {
-            padding: 18px;
+            flex-direction: column;
         }
 
-        .bubble {
-            max-width: 100%;
+        .input-area input,
+        .input-area button {
+            width: 100%;
         }
     }
 </style>

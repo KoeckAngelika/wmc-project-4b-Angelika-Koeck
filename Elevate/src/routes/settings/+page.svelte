@@ -26,35 +26,74 @@
 	function logout() {
 		console.log('logout');
 	}
+
+	let mobileMenu = $state(false);
 </script>
 
 <div class="page">
 
 	<!-- NAVBAR -->
 	<nav class="navbar">
-
+			
 		<img
 			src="/logo.png"
 			alt="Elevate Logo"
 			class="logo"
 		/>
 
-		<div class="nav-links">
-			<a onclick={goToDashboard}>Dashboard</a>
-			<a onclick={goToChat}>Chat</a>
-			<a onclick={gotToStatistik}>Statistik</a>
+		<button
+			class="burger"
+			onclick={() => mobileMenu = !mobileMenu}
+		>
+			☰
+		</button>
 
-			<a href="/settings" class="active">
-				Settings
-			</a>
+		<div class:open={mobileMenu} class="nav-links">
+
+			<button
+				onclick={() => {
+					goToDashboard();
+					mobileMenu = false;
+				}}
+			>
+				Dashboard
+			</button>
+
+			<button
+				onclick={() => {
+					goToChat()
+					mobileMenu = false;
+				}}
+			>
+				Chat
+			</button>
+
+			<button
+				onclick={() => {
+					gotToStatistik();
+					mobileMenu = false;
+				}}
+			>
+				Statistik
+			</button>
+
+			<button 
+				class="active"
+				onclick={() => {
+					mobileMenu = false;
+				}}
+			>
+				Einstellungen
+			</button>
+
 		</div>
 
-		<div class="profile-circle">
-			A
+		<div class="nav-right">
+			<div onclick={goToSettings} class="settings">⚙</div>
+			<div class="chat-profile">A</div>
 		</div>
 
 	</nav>
-
 
 	<!-- SETTINGS CARD -->
 	<div class="settings-card">
@@ -157,25 +196,31 @@
 
 	.nav-links {
 		display: flex;
-		gap: 50px;
 		align-items: center;
+		gap: 18px;
+
+		margin-left: 40px;
 	}
 
-	.nav-links a {
-        text-decoration: none;
-        color: #374151;
-        font-size: 15px;
+	.nav-links button {
+		border: none;
+		background: transparent;
 
-        padding: 14px 24px;
-        border-radius: 16px;
+		padding: 12px 22px;
+		border-radius: 16px;
 
-        transition: 0.2s;
-    }
+		font-size: 15px;
+		font-weight: 500;
+		color: #6b7280;
 
-    .nav-links a:hover {
-        background: #eef2ff;
-        color: #4f46e5;
-    }
+		cursor: pointer;
+		transition: 0.2s;
+	}
+
+	.nav-links button:hover {
+		background: #eef2ff;
+		color: #4f46e5;
+	}
 
 	.nav-links .active {
 		background: #dfe3ff;
@@ -367,36 +412,107 @@
 
 	}
 
-	@media (max-width: 800px) {
+	.burger {
+		display: none;
+	}
+
+	@media (max-width: 700px) {
 
 		.page {
 			padding: 20px;
 		}
 
+		.navbar {
+			position: relative;
+			z-index: 10000;
+		}
+
+		.logo {
+			width: 150px;
+		}
+
+		.burger {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			width: 46px;
+			height: 46px;
+
+			border: none;
+			border-radius: 16px;
+
+			background: #eef2ff;
+
+			color: #4f46e5;
+			font-size: 24px;
+
+			cursor: pointer;
+		}
+
 		.nav-links {
+			position: absolute;
+
+			top: 82px;
+			right: 0;
+
+			left: auto;
+
+			width: 210px;
+
+			background: rgba(255,255,255,0.98);
+			backdrop-filter: blur(18px);
+
+			border: 1px solid #e5e7eb;
+			border-radius: 24px;
+
+			padding: 14px;
+
+			display: none;
+			flex-direction: column;
+			gap: 10px;
+
+			box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+			z-index: 99999;
+		}
+
+		.nav-links.open {
+			display: flex;
+		}
+
+		.nav-links button {
+			width: 100%;
+
+			text-align: left;
+
+			padding: 14px;
+
+			border-radius: 16px;
+		}
+
+		.nav-right {
 			display: none;
 		}
 
-		.header h1 {
-			font-size: 42px;
+		.sidebar,
+		.chat-box {
+			width: 100%;
+			min-height: auto;
 		}
 
-		.settings-card {
-			padding: 30px;
+		.content {
+			grid-template-columns: 1fr;
 		}
 
-		.language-buttons {
+		.input-area {
 			flex-direction: column;
 		}
 
-		.language-buttons button {
+		.input-area input,
+		.input-area button {
 			width: 100%;
 		}
-
-		.logout-btn {
-			width: 100%;
-		}
-
 	}
 
 </style>

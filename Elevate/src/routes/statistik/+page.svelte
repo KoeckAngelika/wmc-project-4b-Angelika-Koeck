@@ -33,34 +33,72 @@
             ai: true
         }
     ];
+
+    let mobileMenu = $state(false);
 </script>
 
 <div class="page">
 
     <nav class="navbar">
-		
-		<img
-			src="/logo.png"
-			alt="Elevate Logo"
-			class="logo"
-		/>
-        
+            
+        <img
+            src="/logo.png"
+            alt="Elevate Logo"
+            class="logo"
+        />
 
-		<div class="nav-links">
-			<div onclick={goToDashboard}>Dashboard</div>
-			<div onclick={gotToChat}>Chat</div>
-			<div class="active">Statistik</div>
-		</div>
+        <button
+            class="burger"
+            onclick={() => mobileMenu = !mobileMenu}
+        >
+            ☰
+        </button>
 
-		<div class="nav-right">
-			<div onclick={goToSettings} class="settings">⚙</div>
-			<div class="chat-profile">A</div>
-		</div>
-	</nav>
-<!-- 
-    <h1>Deine Statistik</h1>
-    <p class="passwort-text">Analysiere deinen Fortschritt</p> -->
+        <div class:open={mobileMenu} class="nav-links">
 
+            <button
+                onclick={() => {
+                    goToDashboard();
+                    mobileMenu = false;
+                }}
+            >
+                Dashboard
+            </button>
+
+            <button
+                onclick={() => {
+                    gotToChat();
+                    mobileMenu = false;
+                }}
+            >
+                Chat
+            </button>
+
+            <button
+                class="active"
+                onclick={() => {
+                    mobileMenu = false;
+                }}
+            >
+                Statistik
+            </button>
+
+            <button
+                onclick={() => {
+                    goToSettings()
+                    mobileMenu = false;
+                }}
+            >
+                Einstellungen
+            </button>
+
+        </div>
+
+        <div class="nav-right">
+            <div onclick={goToSettings} class="settings">⚙</div>
+            <div class="chat-profile">A</div>
+        </div>
+    </nav>
     <div class="content">
 
         <div class="sidebar">
@@ -158,17 +196,35 @@
 
 
 <style>
-	:global(body) {
-		margin: 0;
-		font-family: Inter, sans-serif;
-		background: #f5f5f7;
-	}
+	:global(*) {
+        box-sizing: border-box;
+    }
+
+    :global(html, body) {
+        margin: 0;
+        padding: 0;
+
+        width: 100%;
+        min-height: 100%;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        font-family: Inter, sans-serif;
+        background: #f5f5f7;
+    }
 
 	.page {
-		padding: 40px 70px;
-		min-height: 100vh;
-		box-sizing: border-box;
-	}
+        padding: 40px 70px;
+        min-height: 100vh;
+
+        width: 100%;
+        max-width: 100%;
+
+        box-sizing: border-box;
+
+        overflow-x: hidden;
+    }
 
 	.navbar {
         height: 90px;
@@ -201,7 +257,10 @@
         margin-left: 40px;
     }
 
-    .nav-links div {
+    .nav-links button {
+        border: none;
+        background: transparent;
+
         padding: 12px 22px;
         border-radius: 16px;
 
@@ -213,7 +272,7 @@
         transition: 0.2s;
     }
 
-    .nav-links div:hover {
+    .nav-links button:hover {
         background: #f3f4f6;
         color: #111827;
     }
@@ -284,6 +343,8 @@
         display: grid;
         grid-template-columns: 320px 1fr;
         gap: 28px;
+
+        width: 100%;
     }
 
     .sidebar {
@@ -373,102 +434,189 @@
 
     }
 
+    .burger {
+        display: none;
+    }
+
     @media (max-width: 700px) {
+
         .page {
             padding: 20px;
         }
 
+        .navbar {
+            position: relative;
+            z-index: 10000;
+        }
+
+        .logo {
+            width: 150px;
+        }
+
+        .burger {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 46px;
+            height: 46px;
+
+            border: none;
+            border-radius: 16px;
+
+            background: #eef2ff;
+
+            color: #4f46e5;
+            font-size: 24px;
+
+            cursor: pointer;
+        }
+
         .nav-links {
+            position: absolute;
+
+            top: 82px;
+            right: 0;
+
+            left: auto;
+
+            width: 190px;
+
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(18px);
+
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+
+            padding: 14px;
+
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+            z-index: 99999;
+
+            margin-left: 0;
+        }
+
+        .nav-links.open {
+            display: flex;
+        }
+
+        .nav-links button {
+            width: 100%;
+            text-align: left;
+            padding: 14px;
+        }
+
+        .nav-right {
             display: none;
         }
 
         .content {
+            grid-template-columns: 1fr;
             gap: 20px;
         }
 
+        .sidebar,
+        .stats-box {
+            width: 100%;
+            min-height: auto;
+            padding: 24px;
+        }
+
+        .bottom-cards {
+            flex-direction: column;
+        }
+
+        .mini-card {
+            width: 100%;
+        }
     }
 
     /* STATISTIK */
 
-.stats-box {
-    background: rgba(255,255,255,0.82);
-    backdrop-filter: blur(18px);
+    .stats-box {
+        background: rgba(255,255,255,0.82);
+        backdrop-filter: blur(18px);
 
-    border: 1px solid #e5e7eb;
-    border-radius: 34px;
+        border: 1px solid #e5e7eb;
+        border-radius: 34px;
 
-    padding: 40px;
+        padding: 40px;
 
-    min-height: 760px;
-    box-sizing: border-box;
+        min-height: 760px;
+        box-sizing: border-box;
 
-    box-shadow: 0 12px 30px rgba(0,0,0,0.04);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.04);
 
-    display: flex;
-    flex-direction: column;
-}
+        display: flex;
+        flex-direction: column;
+    }
 
-.stats-header h2 {
-    margin: 0;
+    .stats-header h2 {
+        margin: 0;
 
-    font-size: 48px;
-    font-weight: 700;
+        font-size: 48px;
+        font-weight: 700;
 
-    color: #111827;
-}
+        color: #111827;
+    }
 
-.stats-header p {
-    margin-top: 10px;
+    .stats-header p {
+        margin-top: 10px;
 
-    color: #6b7280;
-    font-size: 16px;
-}
+        color: #6b7280;
+        font-size: 16px;
+    }
 
-.stats-main {
-    margin-top: 40px;
-}
+    .stats-main {
+        margin-top: 40px;
+    }
 
-.stats-left h1 {
-    margin: 0;
+    .stats-left h1 {
+        margin: 0;
 
-    font-size: 88px;
-    font-weight: 700;
+        font-size: 88px;
+        font-weight: 700;
 
-    color: #111827;
-}
+        color: #111827;
+    }
 
-.stats-left span {
-    display: block;
-    margin-top: 10px;
+    .stats-left span {
+        display: block;
+        margin-top: 10px;
 
-    color: #22c55e;
-    font-size: 24px;
-    font-weight: 500;
-}
+        color: #22c55e;
+        font-size: 24px;
+        font-weight: 500;
+    }
 
-.graph {
-    margin-top: 60px;
+    .graph {
+        margin-top: 60px;
 
-    width: 100%;
-    height: 320px;
+        width: 100%;
+        height: 320px;
 
-    border-radius: 32px;
+        border-radius: 32px;
 
-    background: #f5f5f7;
+        background: #f5f5f7;
 
-    padding: 30px;
+        padding: 30px;
 
-    box-sizing: border-box;
+        box-sizing: border-box;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-.chart {
-    width: 100%;
-    height: 100%;
-}
+    .chart {
+        width: 100%;
+        height: 100%;
+    }
 
 
 
@@ -479,6 +627,8 @@
 
         display: flex;
         gap: 24px;
+
+        flex-wrap: wrap;
     }
 
     .mini-card {

@@ -1,7 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
 
-	
 	function goToChat(){
 		goto('/chat');
 	}
@@ -38,6 +37,8 @@
 			done: false
 		}
 	];
+
+	let mobileMenu = $state(false);
 </script>
 
 <div class="page">
@@ -49,15 +50,60 @@
 			class="logo"
 		/>
 
-		<div class="nav-links">
-			<div class="active">Dashboard</div>
-			<div onclick={goToChat}>Chat</div>
-			<div onclick={gotToStatistik}>Statistik</div>
+		<div class="mobile-actions">
+
+
+			<button
+				class="burger"
+				onclick={() => mobileMenu = !mobileMenu}
+			>
+				☰
+			</button>
+
+		</div>
+
+		<div class:open={mobileMenu} class="nav-links">
+
+			<button
+				class="active"
+				onclick={() => {
+					mobileMenu = false;
+				}}
+			>
+				Dashboard
+			</button>
+
+			<button
+				onclick={() => {
+					goToChat();
+					mobileMenu = false;
+				}}
+			>
+				Chat
+			</button>
+
+			<button
+				onclick={() => {
+					gotToStatistik();
+					mobileMenu = false;
+				}}
+			>
+				Statistik
+			</button>
+
+			<button
+				onclick={() => {
+					goToSettings();
+					mobileMenu = false;
+				}}
+			>
+				Einstellungen
+			</button>
+
 		</div>
 
 		<div class="nav-right">
-			<div onclick={goToSettings} class="settings">⚙</div>
-			<div class="profile">A</div>
+			<button onclick={goToSettings} class="settings">⚙</button>			<div class="profile">A</div>
 		</div>
 	</nav>
 
@@ -129,50 +175,81 @@
 </div>
 
 <style>
-	:global(body) {
+	:global(*) {
+		box-sizing: border-box;
+	}
+
+	:global(html, body) {
 		margin: 0;
-		font-family: Inter, sans-serif;
-		background: #f5f5f7;
+		padding: 0;
+
+		width: 100%;
+		min-height: 100%;
+
+		overflow-y: auto;
+		overflow-x: hidden;
 	}
 
 	.page {
 		padding: 40px 70px;
 		min-height: 100vh;
 		box-sizing: border-box;
+
+		width: 100%;
+		max-width: 100%;
+
+		overflow-x: hidden;
+	}
+
+	.mobile-actions {
+		display: flex;
+		align-items: center;
+		gap: 10px;
 	}
 
 	.navbar {
-	height: 90px;
-	background: rgba(255,255,255,0.75);
-	backdrop-filter: blur(16px);
+		height: 90px;
 
-	border: 1px solid #e5e7eb;
-	border-radius: 30px;
+		background: rgba(255,255,255,0.75);
+		backdrop-filter: blur(16px);
 
-	padding: 0 30px;
+		border: 1px solid #e5e7eb;
+		border-radius: 30px;
 
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
+		padding: 0 30px;
 
-	box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-}
+		display: flex;
+		align-items: center;
 
-.logo {
-	width: 220px;
-	object-fit: contain;
-	display: block;
-}
+		box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+	}
 
-.nav-links {
-	display: flex;
-	align-items: center;
-	gap: 18px;
+	.logo {
+		width: 220px;
+		object-fit: contain;
+		display: block;
+	}
 
-	margin-left: 40px;
-}
+	.nav-links {
+		display: flex;
+		align-items: center;
+		gap: 18px;
 
-.nav-links div {
+		margin-left: 60px;
+	}
+
+	.nav-right {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+
+		margin-left: auto;
+	}
+
+.nav-links button {
+	border: none;
+	background: transparent;
+
 	padding: 12px 22px;
 	border-radius: 16px;
 
@@ -184,7 +261,7 @@
 	transition: 0.2s;
 }
 
-.nav-links div:hover {
+.nav-links button:hover {
 	background: #f3f4f6;
 	color: #111827;
 }
@@ -198,9 +275,7 @@
 .nav-right {
 	display: flex;
 	align-items: center;
-	gap: 14px;
-
-	margin-left: auto;
+	gap: 10px;
 }
 
 .settings,
@@ -222,6 +297,7 @@
 
 .settings {
 	background: #f3f4f6;
+	border: none;
 }
 
 .settings:hover {
@@ -255,9 +331,12 @@
 
 	.content {
 		margin-top: 35px;
+
 		display: grid;
 		grid-template-columns: 2fr 1fr;
 		gap: 30px;
+
+		width: 100%;
 	}
 
 	.main-card,
@@ -444,21 +523,94 @@
 		}
 	}
 
+	.burger {
+		display: none;
+	}
+
 	@media (max-width: 700px) {
+
 		.page {
 			padding: 20px;
 		}
 
+		.navbar {
+			position: relative;
+			z-index: 10000;
+		}
+
+		.logo {
+			width: 150px;
+		}
+
+		.burger {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			width: 46px;
+			height: 46px;
+
+			border: none;
+			border-radius: 16px;
+
+			background: #eef2ff;
+
+			color: #4f46e5;
+			font-size: 24px;
+
+			cursor: pointer;
+		}
+
 		.nav-links {
+			position: absolute;
+
+			top: 82px;
+			right: 0;
+
+			left: auto;
+
+			width: 190px;
+
+			background: rgba(255,255,255,0.98);
+			backdrop-filter: blur(18px);
+
+			border: 1px solid #e5e7eb;
+			border-radius: 24px;
+
+			padding: 14px;
+
+			display: none;
+			flex-direction: column;
+			gap: 10px;
+
+			box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+			z-index: 99999;
+
+			margin-left: 0;
+		}
+
+		.nav-links.open {
+			display: flex;
+		}
+
+		.nav-links button {
+			width: 100%;
+			text-align: left;
+			padding: 14px;
+		}
+
+		.nav-right {
 			display: none;
 		}
 
-		.hero h1 {
-			font-size: 34px;
+		.content {
+			grid-template-columns: 1fr;
 		}
 
 		.main-card,
 		.side-card {
+			width: 100%;
 			padding: 25px;
 		}
 
