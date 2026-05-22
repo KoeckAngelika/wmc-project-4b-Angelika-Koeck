@@ -1,5 +1,47 @@
 <script>
 
+	import { goto } from '$app/navigation';
+
+	let email = $state('');
+	let username = $state('');
+	let password = $state('');
+	let birthdate = $state('');
+	let size = $state('');
+	let weight = $state('');
+
+	async function goToLogin(){
+
+		if(email != '' || username != '' || password != '' || birthdate != '' || size != 0 || weight != 0){
+
+			const parsedHeight = parseInt(size);
+			const parsedWeight = parseFloat(weight);
+			const response = await fetch(
+				"http://localhost:3000/auth/register",
+				{
+					method: "POST",
+
+					headers: {
+						"Content-Type": "application/json"
+					},
+
+					body: JSON.stringify({
+						email,
+						username,
+						password,
+						birthdate,
+						height_cm: parsedHeight,
+    					weight_kg: parsedWeight
+					})
+				}
+    		);
+
+    		const data = await response.json();
+
+			goto('/login');
+		}
+
+	}
+	
 </script>
 
 <div class="page">
@@ -14,19 +56,19 @@
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
             <label>E-Mail</label>
-            <input type="text" placeholder="test@user">
+            <input bind:value={email} type="text" placeholder="test@user">
         </div>
 
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
             <label>E-Benutzername</label>
-            <input type="text" placeholder="User1234">
+            <input bind:value={username} type="text" placeholder="User1234">
         </div>
 
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
             <label>Passwort</label>
-            <input type="password" placeholder="*******">
+            <input bind:value={password} type="password" placeholder="*******">
             <p class="passwort-text">Mindestens 8 Zeichen, inklusive Zahlen und Sonderzeichen</p>
         </div>
 
@@ -34,13 +76,13 @@
             <!-- svelte-ignore a11y_label_has_associated_control -->
             <label>Persöhnliche Daten</label>
             <div class="personal-data">
-                <input type="date" placeholder="Alter" />
-                <input min="30" max="300" type="number" placeholder="Größe in cm" />
-                <input min="10" type="number" placeholder="Gewicht in kg" />
+                <input bind:value={birthdate} type="date" placeholder="Alter" />
+                <input bind:value={size} min="30" max="300" type="number" placeholder="Größe in cm" />
+                <input bind:value={weight} min="10" type="number" placeholder="Gewicht in kg" />
             </div>
         </div>
 
-        <button>
+        <button onclick={goToLogin}>
             Registrieren
         </button>
 

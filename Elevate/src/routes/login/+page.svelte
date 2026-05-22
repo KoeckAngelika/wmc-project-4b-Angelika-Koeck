@@ -2,7 +2,23 @@
 	import { goto } from '$app/navigation';
 
 
-	function goTodashboard(){
+	let username = $state('');
+	let password = $state('');
+
+	async function goTodashboard(){
+		const response = await fetch(
+			"http://localhost:3000/auth/login", 
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json"},
+				body: JSON.stringify({
+					username: username,
+					passwort: passwort
+				})
+			}
+		)
+
+
 		goto('/dashboard');
 	}
 </script>
@@ -19,13 +35,13 @@
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
             <label>Benutzername</label>
-            <input type="text" placeholder="Username">
+            <input bind:value={username} type="text" placeholder="Username">
         </div>
 
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
             <label>Passwort</label>
-            <input type="password" placeholder="*******">
+            <input bind:value={password} type="password" placeholder="*******">
 			
             <p class="passwort-text">Mindestens 8 Zeichen, inklusive Zahlen und Sonderzeichen</p>
         </div>
