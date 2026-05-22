@@ -47,12 +47,16 @@
             class="logo"
         />
 
-        <button
-            class="burger"
-            onclick={() => mobileMenu = !mobileMenu}
-        >
-            ☰
-        </button>
+        <div class="mobile-actions">
+
+            <button
+                class="burger"
+                onclick={() => mobileMenu = !mobileMenu}
+            >
+                ☰
+            </button>
+
+        </div>
 
         <div class:open={mobileMenu} class="nav-links">
 
@@ -84,8 +88,9 @@
             </button>
 
             <button
+                class="mobile-settings-link"
                 onclick={() => {
-                    goToSettings()
+                    goToSettings();
                     mobileMenu = false;
                 }}
             >
@@ -226,6 +231,16 @@
         overflow-x: hidden;
     }
 
+    .mobile-actions {
+        display: none;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .mobile-settings-link {
+        display: none;
+    }
+
 	.navbar {
         height: 90px;
         background: rgba(255,255,255,0.75);
@@ -254,7 +269,7 @@
         align-items: center;
         gap: 18px;
 
-        margin-left: 40px;
+        margin-left: 60px;
     }
 
     .nav-links button {
@@ -262,13 +277,16 @@
         background: transparent;
 
         padding: 12px 22px;
+
         border-radius: 16px;
 
         font-size: 15px;
         font-weight: 500;
+
         color: #6b7280;
 
         cursor: pointer;
+
         transition: 0.2s;
     }
 
@@ -658,5 +676,119 @@
     .red {
         background: #fee2e2;
         color: #b91c1c;
+    }
+
+    @media (max-width: 950px) {
+
+        .mobile-settings-link {
+            display: block;
+        }
+
+        .page {
+            padding: 20px;
+        }
+
+        .navbar {
+            position: relative;
+            z-index: 10000;
+        }
+
+        .logo {
+            width: 180px;
+        }
+
+        .mobile-actions {
+            display: flex;
+            margin-left: auto;
+        }
+
+        .burger {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 46px;
+            height: 46px;
+
+            border: none;
+            border-radius: 16px;
+
+            background: #f3f4f6;
+
+            color: #4f46e5;
+            font-size: 20px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .burger:hover {
+            background: #e0e7ff;
+        }
+
+        .nav-links {
+            position: absolute;
+
+            top: 82px;
+            right: 0;
+
+            left: auto;
+
+            width: 190px;
+
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(18px);
+
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+
+            padding: 14px;
+
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+            z-index: 99999;
+
+            margin-left: 0;
+        }
+
+        .nav-links.open {
+            display: flex;
+        }
+
+        .nav-links button {
+            width: 100%;
+            text-align: left;
+            padding: 14px;
+        }
+
+        .nav-right {
+            display: none;
+        }
+
+        .content {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .sidebar,
+        .stats-box {
+            width: 100%;
+            min-height: auto;
+            padding: 24px;
+        }
+
+        .bottom-cards {
+            flex-direction: column;
+        }
+
+        .mini-card {
+            width: 100%;
+        }
     }
 </style>

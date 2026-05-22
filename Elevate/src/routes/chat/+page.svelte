@@ -46,12 +46,16 @@
             class="logo"
         />
 
-        <button
-            class="burger"
-            onclick={() => mobileMenu = !mobileMenu}
-        >
-            ☰
-        </button>
+        <div class="mobile-actions">
+
+            <button
+                class="burger"
+                onclick={() => mobileMenu = !mobileMenu}
+            >
+                ☰
+            </button>
+
+        </div>
 
         <div class:open={mobileMenu} class="nav-links">
 
@@ -83,8 +87,9 @@
             </button>
 
             <button
+                class="mobile-settings-link"
                 onclick={() => {
-                    goToSettings()
+                    goToSettings();
                     mobileMenu = false;
                 }}
             >
@@ -191,8 +196,19 @@
         overflow-x: hidden;
     }
 
+    .mobile-actions {
+        display: none;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .mobile-settings-link {
+        display: none;
+    }
+
 	.navbar {
         height: 90px;
+
         background: rgba(255,255,255,0.75);
         backdrop-filter: blur(16px);
 
@@ -203,7 +219,6 @@
 
         display: flex;
         align-items: center;
-        justify-content: space-between;
 
         box-shadow: 0 10px 30px rgba(0,0,0,0.04);
     }
@@ -215,32 +230,11 @@
     }
 
     .nav-links {
-        position: absolute;
+        display: flex;
+        align-items: center;
+        gap: 18px;
 
-        top: 82px;
-        right: 0;
-
-        left: auto;
-
-        width: 190px;
-
-        background: rgba(255,255,255,0.96);
-        backdrop-filter: blur(18px);
-
-        border: 1px solid #e5e7eb;
-        border-radius: 24px;
-
-        padding: 14px;
-
-        display: none;
-        flex-direction: column;
-        gap: 10px;
-
-        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-
-        z-index: 9999;
-
-        margin-left: 0;
+        margin-left: 60px;
     }
 
     .nav-links.open {
@@ -248,30 +242,23 @@
     }
 
     .nav-links button {
-        width: 100%;
-
-        padding: 14px;
-
         border: none;
-        border-radius: 16px;
-
         background: transparent;
 
-        text-align: left;
+        padding: 12px 22px;
+        border-radius: 16px;
 
         font-size: 15px;
-        font-weight: 600;
-
-        color: #374151;
+        font-weight: 500;
+        color: #6b7280;
 
         cursor: pointer;
-
         transition: 0.2s;
     }
 
     .nav-links button:hover {
-        background: #eef2ff;
-        color: #4f46e5;
+        background: #f3f4f6;
+        color: #111827;
     }
 
     .active {
@@ -676,6 +663,119 @@
         .nav-links button {
             width: 100%;
             text-align: center;
+        }
+
+        .nav-right {
+            display: none;
+        }
+
+        .sidebar,
+        .chat-box {
+            width: 100%;
+            min-height: auto;
+        }
+
+        .content {
+            grid-template-columns: 1fr;
+        }
+
+        .input-area {
+            flex-direction: column;
+        }
+
+        .input-area input,
+        .input-area button {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 950px) {
+
+        .mobile-settings-link {
+            display: block;
+        }
+
+        .page {
+            padding: 20px;
+        }
+
+        .navbar {
+            position: relative;
+            z-index: 10000;
+        }
+
+        .logo {
+            width: 180px;
+        }
+
+        .mobile-actions {
+            display: flex;
+            margin-left: auto;
+        }
+
+        .burger {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 46px;
+            height: 46px;
+
+            border: none;
+            border-radius: 16px;
+
+            background: #f3f4f6;
+
+            color: #4f46e5;
+            font-size: 20px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .burger:hover {
+            background: #e0e7ff;
+        }
+
+        .nav-links {
+            position: absolute;
+
+            top: 82px;
+            right: 0;
+
+            left: auto;
+
+            width: 190px;
+
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(18px);
+
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+
+            padding: 14px;
+
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+            z-index: 99999;
+
+            margin-left: 0;
+        }
+
+        .nav-links.open {
+            display: flex;
+        }
+
+        .nav-links button {
+            width: 100%;
+            text-align: left;
+            padding: 14px;
         }
 
         .nav-right {

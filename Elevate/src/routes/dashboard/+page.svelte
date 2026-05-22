@@ -92,6 +92,7 @@
 			</button>
 
 			<button
+				class="mobile-settings-link"
 				onclick={() => {
 					goToSettings();
 					mobileMenu = false;
@@ -202,7 +203,7 @@
 	}
 
 	.mobile-actions {
-		display: flex;
+		display: none;
 		align-items: center;
 		gap: 10px;
 	}
@@ -222,6 +223,10 @@
 		align-items: center;
 
 		box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+	}
+
+	.mobile-settings-link {
+		display: none;
 	}
 
 	.logo {
@@ -529,6 +534,10 @@
 
 	@media (max-width: 700px) {
 
+		.mobile-settings-link {
+			display: block;
+		}
+
 		.page {
 			padding: 20px;
 		}
@@ -539,7 +548,7 @@
 		}
 
 		.logo {
-			width: 150px;
+			width: 180px;
 		}
 
 		.burger {
@@ -620,6 +629,70 @@
 
 		.buttons button {
 			width: 100%;
+		}
+	}
+
+	@media (max-width: 950px) {
+
+		.nav-links {
+			position: absolute;
+
+			top: 82px;
+			right: 0;
+
+			left: auto;
+
+			width: 190px;
+
+			background: rgba(255,255,255,0.98);
+			backdrop-filter: blur(18px);
+
+			border: 1px solid #e5e7eb;
+			border-radius: 24px;
+
+			padding: 14px;
+
+			flex-direction: column;
+			gap: 10px;
+
+			box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+			z-index: 99999;
+
+			margin-left: 0;
+		}
+
+		.nav-links.open {
+			display: flex;
+		}
+
+		.mobile-actions {
+			display: flex;
+			margin-left: auto;
+		}
+
+		
+		.burger {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			width: 46px;
+			height: 46px;
+
+			border: none;
+			border-radius: 16px;
+
+			background: #eef2ff;
+
+			color: #4f46e5;
+			font-size: 24px;
+
+			cursor: pointer;
+		}
+
+		.nav-right {
+			display: none;
 		}
 	}
 </style>
