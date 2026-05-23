@@ -105,4 +105,49 @@ router.patch("/:id/toggle", (req, res) => {
 
 });
 
+router.delete("/:id", (req, res) => {
+
+	const id = req.params.id;
+
+	const sql = `
+		DELETE FROM activities
+		WHERE id = ?
+	`;
+
+	db.run(sql, [id], function(err) {
+
+		if(err) {
+			return res.status(500).json(err);
+		}
+
+		res.json({
+			success: true
+		});
+
+	});
+
+});
+
+router.get("/single/:id", (req, res) => {
+
+	const id = req.params.id;
+
+	const sql = `
+		SELECT *
+		FROM activities
+		WHERE id = ?
+	`;
+
+	db.get(sql, [id], (err, row) => {
+
+		if(err) {
+			return res.status(500).json(err);
+		}
+
+		res.json(row);
+
+	});
+
+});
+
 module.exports = router;

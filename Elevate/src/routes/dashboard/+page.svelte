@@ -25,10 +25,30 @@
 
 	}
 
+	function editTask(id) {
+
+		goto(`/aktivität-hinzufügen?id=${id}`);
+
+	}
+
 	let tasks = $state([]);
 
 	let selectedDate = $state(new Date());
 	let mobileMenu = $state(false);
+
+	let progress = $derived.by(() => {
+
+		if(tasks.length === 0) {
+			return 0;
+		}
+
+		const completedTasks = tasks.filter(task => task.completed).length;
+
+		return Math.round(
+			(completedTasks / tasks.length) * 100
+		);
+
+	});
 
 
 	async function loadTasks() {
@@ -82,6 +102,31 @@
 				`http://localhost:3000/tasks/${id}/toggle`,
 				{
 					method: 'PATCH'
+				}
+			);
+
+			const data = await response.json();
+
+			console.log(data);
+
+			loadTasks();
+
+		} catch(error) {
+
+			console.log(error);
+
+		}
+
+	}
+
+	async function deleteTask(id) {
+
+		try {
+
+			const response = await fetch(
+				`http://localhost:3000/tasks/${id}`,
+				{
+					method: 'DELETE'
 				}
 			);
 
@@ -221,6 +266,8 @@
 
 						</div>
 
+						<div class="task-right">
+
 						<div class:done-pill={task.completed} class="status-pill">
 
 							{#if task.completed}
@@ -231,7 +278,23 @@
 
 						</div>
 
+						<button
+							class="delete-task"
+							onclick={() => deleteTask(task.id)}
+						>
+							🗑
+						</button>
+
+						<button
+							class="edit-task"
+							onclick={() => editTask(task.id)}
+						>
+							✏️
+						</button>
+
 					</div>
+
+				</div>
 
 				{/each}
 
@@ -240,18 +303,20 @@
 			<div class="progress-section">
 				<div class="progress-head">
 					<p>Tagesfortschritt</p>
-					<span>72%</span>
+					<span>{progress}%</span>				
 				</div>
 
 				<div class="progress-bar">
-					<div class="progress-fill"></div>
+					<div
+						class="progress-fill"
+						style={`width:${progress}%`}
+					></div>
 				</div>
 			</div>
 
 			<div class="buttons">
 				<button onclick={goToCreateActivity} class="add">Hinzufügen</button>
 				<button class="edit">Bearbeiten</button>
-				<button class="delete">Löschen</button>
 			</div>
 		</div>
 
@@ -260,7 +325,7 @@
 			<p>Bleibe diese Woche aktiv und erreiche deine tägliche Routine.</p>
 
 			<div class="circle">
-				72%
+				{progress}%
 			</div>
 
 			<button class="motivation">
@@ -301,6 +366,44 @@
 		display: none;
 		align-items: center;
 		gap: 10px;
+	}
+
+	.task-right {
+
+		display: flex;
+		align-items: center;
+
+		gap: 14px;
+
+	}
+
+	.delete-task {
+
+		width: 42px;
+		height: 42px;
+
+		border: none;
+
+		border-radius: 14px;
+
+		background: #fee2e2;
+
+		color: #dc2626;
+
+		font-size: 18px;
+
+		cursor: pointer;
+
+		transition: 0.2s;
+
+	}
+
+	.delete-task:hover {
+
+		transform: scale(1.08);
+
+		background: #fecaca;
+
 	}
 
 	.navbar {

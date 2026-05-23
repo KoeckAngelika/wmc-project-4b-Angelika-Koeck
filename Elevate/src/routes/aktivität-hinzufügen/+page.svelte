@@ -42,6 +42,7 @@
 		return `${timeText} ${activity || 'Joggen'} · ${repeat || '10 mal'}`;
 
 	});
+	
 
 	async function addActivity() {
 
