@@ -37,6 +37,13 @@
 
     		const data = await response.json();
 
+			if (data.message === "Benutzername existiert bereits") {
+
+				alert("Benutzername bereits vergeben");
+
+				return;
+			}
+
 			goto('/login');
 		}
 

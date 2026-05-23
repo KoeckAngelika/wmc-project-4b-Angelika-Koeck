@@ -8,9 +8,11 @@ app.use(express.json());
 
 const userRoutes = require("./routes/users");
 const authRoutes = require("./routes/auth");
+const activityRoutes = require('./routes/activities');
 
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
+app.use('/tasks', activityRoutes);
 
 app.get("/", (req, res) => {
     res.send("Backend läuft");

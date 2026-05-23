@@ -1,28 +1,96 @@
 <script>
-	let activity = '';
-	let duration = '';
-	let repeat = '';
+
+	import { page } from '$app/state';
+
+	import { goto } from '$app/navigation';
+
+	function gotToDashboard(){
+		goto('/dashboard');
+	}
+
+
+	let activity = $state('');
+	let duration = $state('');
+	let repeat = $state('');
 
 	let unit = 'Minuten';
 
-	const preview = $derived(
-		`${duration || '30'} ${unit} ${activity || 'Joggen'} · ${repeat || '10 mal'}`
-	);
+	const selectedDate = $derived.by(() => {
 
-	function addActivity() {
-		console.log({
-			activity,
-			duration,
-			repeat,
-			unit
-		});
+		if(!page.url) {
+			return '';
+		}
+
+		return page.url.searchParams.get('date');
+
+	});
+
+	let preview = $derived.by(() => {
+
+		const value = Number(duration || 0);
+
+		let timeText = `${value} ${unit}`;
+
+		if(unit === 'Minuten' && value >= 60) {
+
+			const hours = (value / 60).toFixed(1);
+
+			timeText = `${hours} Stunden`;
+
+		}
+
+		return `${timeText} ${activity || 'Joggen'} · ${repeat || '10 mal'}`;
+
+	});
+
+	async function addActivity() {
+
+		try {
+
+			const response = await fetch(
+				'http://localhost:3000/tasks',
+				{
+					method: 'POST',
+
+					headers: {
+						'Content-Type': 'application/json'
+					},
+
+					body: JSON.stringify({
+						name: activity,
+						duration,
+						repeat,
+						unit,
+						date: selectedDate,
+						done: false,
+						color: '#EEF2FF',
+						accent: '#6366F1'
+					})
+				}
+			);
+
+			const data = await response.json();
+
+			console.log(data);
+
+		} catch(error) {
+
+			console.log(error);
+
+		}
+
+		gotToDashboard();
+
 	}
 
 	function cancel() {
+
 		activity = '';
 		duration = '';
 		repeat = '';
+
 	}
+
 </script>
 
 <div class="overlay">
@@ -101,14 +169,14 @@
 
 			<button
 				class="cancel-btn"
-				on:click={cancel}
+				onclick={cancel}
 			>
 				Abbrechen
 			</button>
 
 			<button
 				class="add-btn"
-				on:click={addActivity}
+				onclick={addActivity}
 			>
 				Hinzufügen
 			</button>

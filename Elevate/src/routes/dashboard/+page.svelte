@@ -13,32 +13,92 @@
 		goto('/settings');
 	}
 
-	function goToCreateActivity(){
-		goto('/aktivität-hinzufügen');
+	function formatDate(date) {
+		return date.toISOString().split('T')[0];
 	}
 
-	const tasks = [
-		{
-			name: '20 Minuten Joggen',
-			color: '#EEF2FF',
-			accent: '#6366F1',
-			done: false
-		},
-		{
-			name: '2 Liter Wasser trinken',
-			color: '#ECFDF5',
-			accent: '#22C55E',
-			done: true
-		},
-		{
-			name: '10 Minuten Dehnen',
-			color: '#FFFBEB',
-			accent: '#F59E0B',
-			done: false
-		}
-	];
+	function goToCreateActivity(){
 
+		goto(
+			`/aktivität-hinzufügen?date=${formatDate(selectedDate)}`
+		);
+
+	}
+
+	let tasks = $state([]);
+
+	let selectedDate = $state(new Date());
 	let mobileMenu = $state(false);
+
+
+	async function loadTasks() {
+
+		try {
+
+			const response = await fetch(
+				`http://localhost:3000/tasks/${formatDate(selectedDate)}`
+			);
+			const data = await response.json();
+
+			tasks = data;
+
+		} catch (error) {
+
+			console.log(error);
+
+		}
+
+	}
+
+	$effect(() => {
+		loadTasks();
+	});
+
+	function previousDay() {
+
+		const newDate = new Date(selectedDate);
+
+		newDate.setDate(newDate.getDate() - 1);
+
+		selectedDate = newDate;
+
+	}
+
+	function nextDay() {
+
+		const newDate = new Date(selectedDate);
+
+		newDate.setDate(newDate.getDate() + 1);
+
+		selectedDate = newDate;
+
+	}
+
+	async function toggleTask(id) {
+
+		try {
+
+			const response = await fetch(
+				`http://localhost:3000/tasks/${id}/toggle`,
+				{
+					method: 'PATCH'
+				}
+			);
+
+			const data = await response.json();
+
+			console.log(data);
+
+			loadTasks();
+
+		} catch(error) {
+
+			console.log(error);
+
+		}
+
+	}
+
 </script>
 
 <div class="page">
@@ -117,29 +177,64 @@
 	<div class="content">
 		<div class="main-card">
 			<div class="top-row">
-				<button>←</button>
-				<h2>Heute</h2>
-				<button>→</button>
+
+				<button onclick={previousDay}>
+					←
+				</button>
+
+				<h2>
+					{selectedDate.toLocaleDateString('de-DE', {
+						day: '2-digit',
+						month: 'long'
+					})}
+				</h2>
+
+				<button onclick={nextDay}>
+					→
+				</button>
+
 			</div>
 
 			<div class="tasks">
-				{#each tasks as task}
-					<div class="task" style={`background:${task.color}`}>
-						{#if task.done}
-							<div
-								class="checkbox done"
-								style={`background:${task.accent}`}
-							></div>
-						{:else}
-							<div
-								class="checkbox"
-								style={`border-color:${task.accent}`}
-							></div>
-						{/if}
 
-						<span>{task.name}</span>
+				{#each tasks as task}
+
+					<div class="task">
+
+						<div class="task-left">
+
+							<button
+								class:done={task.completed}
+								class="checkbox"
+								onclick={() => toggleTask(task.id)}
+							></button>
+
+							<div class="task-content">
+
+								<h3>{task.title}</h3>
+
+								<p>
+									{task.duration_min} Minuten
+								</p>
+
+							</div>
+
+						</div>
+
+						<div class:done-pill={task.completed} class="status-pill">
+
+							{#if task.completed}
+								Erledigt
+							{:else}
+								Offen
+							{/if}
+
+						</div>
+
 					</div>
+
 				{/each}
+
 			</div>
 
 			<div class="progress-section">
@@ -377,19 +472,134 @@
 	}
 
 	.tasks {
-		margin-top: 40px;
+
+		margin-top: 35px;
+
 		display: flex;
 		flex-direction: column;
-		gap: 22px;
+
+		gap: 18px;
+
 	}
 
 	.task {
-		height: 72px;
-		border-radius: 20px;
-		padding: 0 28px;
+
+		min-height: 84px;
+
+		background: white;
+
+		border: 1px solid #e5e7eb;
+
+		border-radius: 24px;
+
+		padding: 20px 24px;
+
 		display: flex;
 		align-items: center;
-		gap: 22px;
+		justify-content: space-between;
+
+		transition: 0.2s;
+
+		box-shadow:
+			0 4px 14px rgba(0,0,0,0.03);
+
+	}
+
+	.task:hover {
+
+		transform: translateY(-2px);
+
+		box-shadow:
+			0 10px 24px rgba(0,0,0,0.06);
+
+	}
+
+	.task-left {
+
+		display: flex;
+		align-items: center;
+
+		gap: 18px;
+
+	}
+
+	.checkbox {
+
+		width: 26px;
+		height: 26px;
+
+		border-radius: 50%;
+
+		border: 2px solid #6366f1;
+
+		background: white;
+
+		cursor: pointer;
+
+		transition: 0.2s;
+
+		flex-shrink: 0;
+
+		padding: 0;
+
+	}
+
+	.checkbox:hover {
+
+		transform: scale(1.08);
+
+	}
+
+	.checkbox.done {
+
+		background: #6366f1;
+
+		box-shadow:
+			0 0 0 5px #e0e7ff;
+
+	}
+
+	.task-content h3 {
+
+		margin: 0;
+
+		font-size: 17px;
+
+		color: #111827;
+
+	}
+
+	.task-content p {
+
+		margin-top: 6px;
+
+		font-size: 14px;
+
+		color: #6b7280;
+
+	}
+
+	.status-pill {
+
+		padding: 10px 16px;
+
+		border-radius: 999px;
+
+		background: #f3f4f6;
+
+		color: #6b7280;
+
+		font-size: 13px;
+		font-weight: 700;
+
+	}
+
+	.done-pill {
+
+		background: #dcfce7;
+
+		color: #166534;
+
 	}
 
 	.checkbox {
