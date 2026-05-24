@@ -41,7 +41,7 @@ router.post("/register", async (req, res) => {
             INSERT INTO users (
                 email,
                 username,
-                password,
+                password_hash,
                 birthdate,
                 height_cm,
                 weight_kg
@@ -65,7 +65,9 @@ router.post("/register", async (req, res) => {
 
                     console.log(err);
 
-                    return res.status(500).json(err);
+                    return res.status(500).json({
+                        error: err.message
+                    });
 
                 }
 
@@ -85,6 +87,61 @@ router.post("/register", async (req, res) => {
         res.status(500).json(error);
 
     }
+
+});
+
+//Test
+router.post("/login", (req, res) => {
+
+    const {
+        username,
+        password
+    } = req.body;
+
+    const sql = `
+        SELECT *
+        FROM users
+        WHERE username = ?
+    `;
+
+    db.get(sql, [username], async (err, user) => {
+
+        if(err) {
+
+            return res.status(500).json(err);
+
+        }
+
+        if(!user) {
+
+            return res.status(401).json({
+                message: "Benutzer nicht gefunden"
+            });
+
+        }
+
+        const validPassword = await bcrypt.compare(
+            password,
+            user.password_hash
+        );
+
+        if(!validPassword) {
+
+            return res.status(401).json({
+                message: "Falsches Passwort"
+            });
+
+        }
+
+        res.json({
+            success: true,
+
+            userId: user.id,
+            username: user.username,
+            email: user.email
+        });
+
+    });
 
 });
 

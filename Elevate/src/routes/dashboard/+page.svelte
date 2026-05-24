@@ -1,5 +1,9 @@
 <script>
 	import { goto } from '$app/navigation';
+	import {
+		getUser,
+		getUserId
+	} from '$lib/components/auth';
 
 	function goToChat(){
 		goto('/chat');
@@ -31,6 +35,8 @@
 
 	}
 
+	let userId = $state(null);
+	let user = $state(null);
 	let tasks = $state([]);
 
 	let selectedDate = $state(new Date());
@@ -56,7 +62,7 @@
 		try {
 
 			const response = await fetch(
-				`http://localhost:3000/tasks/${formatDate(selectedDate)}`
+				`http://localhost:3000/tasks/${userId}/${formatDate(selectedDate)}`
 			);
 			const data = await response.json();
 
@@ -71,7 +77,15 @@
 	}
 
 	$effect(() => {
-		loadTasks();
+
+		user = getUser();
+
+		userId = getUserId();
+
+		if(userId) {
+			loadTasks();
+		}
+
 	});
 
 	function previousDay() {
@@ -215,7 +229,7 @@
 
 
 	<section class="hero">
-		<h1>Guten Morgen, Angelika</h1>
+		<h1>Guten Morgen, {user?.username || 'User'}</h1>
 		<p>dein Überblick für heute</p>
 	</section>
 

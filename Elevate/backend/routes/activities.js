@@ -3,8 +3,9 @@ const router = express.Router();
 
 const db = require("../db");
 
-router.get("/:date", (req, res) => {
+router.get("/:userId/:date", (req, res) => {
 
+	const userId = req.params.userId;
 	const date = req.params.date;
 
 	const sql = `
@@ -16,11 +17,13 @@ router.get("/:date", (req, res) => {
 			duration_min,
 			completed
 		FROM activities
-		WHERE activity_date = ?
+		WHERE
+			user_id = ?
+			AND activity_date = ?
 		ORDER BY activity_date DESC
 	`;
 
-	db.all(sql, [date], (err, rows) => {
+	db.all(sql,[userId,date],(err, rows) => {
 
 		if(err) {
 			return res.status(500).json(err);
@@ -38,7 +41,8 @@ router.post("/", (req, res) => {
 		name,
 		duration,
 		repeat,
-		date
+		date,
+		user_id
 	} = req.body;
 
 	const sql = `
@@ -57,7 +61,7 @@ router.post("/", (req, res) => {
 	db.run(
 		sql,
 		[
-			1,
+			user_id,
 			'fitness',
 			name,
 			repeat,

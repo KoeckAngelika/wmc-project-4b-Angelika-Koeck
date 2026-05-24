@@ -3,6 +3,14 @@
 	import { page } from '$app/state';
 
 	import { goto } from '$app/navigation';
+	
+	import {
+		getUser,
+		getUserId
+	} from '$lib/components/auth';
+
+	let userId = $state(null);
+	let user = $state(null);
 
 	function gotToDashboard(){
 		goto('/dashboard');
@@ -32,6 +40,7 @@
 		}
 
 	});
+
 
 	async function loadTask() {
 
@@ -88,6 +97,8 @@
 
 	async function addActivity() {
 
+		const userId = getUserId();
+
 		if(taskId) {
 			updateTask();
 			return;
@@ -109,9 +120,7 @@
 						repeat,
 						unit,
 						date: selectedDate,
-						done: false,
-						color: '#EEF2FF',
-						accent: '#6366F1'
+						user_id: userId
 					})
 				}
 			);

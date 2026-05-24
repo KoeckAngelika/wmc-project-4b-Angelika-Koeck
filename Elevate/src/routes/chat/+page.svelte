@@ -2,6 +2,7 @@
 
 	import { goto } from '$app/navigation';
     import { io } from 'socket.io-client';
+    import { getUserId } from '$lib/components/auth';
 
     const socket = io('http://localhost:3000');
 
@@ -20,15 +21,31 @@
 
     let messages = $state([]);
 
+    let requests = $state([]);  
+
     let mobileMenu = $state(false);
     let newMessage = $state('');
 
     let search = $state('');
     let users = $state([]);
+    let friends = $state([]);
 
     let tab = $state('contacts');
 
     $effect(() => {
+
+        socket.on('receive_message', (message) => {
+
+            messages = [...messages, message];
+
+        });
+
+    });
+
+    $effect(() => {
+
+        loadRequests();
+	    loadFriends();
 
         socket.on('receive_message', (message) => {
 
@@ -66,12 +83,131 @@
         try {
 
             const response = await fetch(
-                `http://localhost:3000/users/search/${search}`
+                `http://localhost:3000/users/search/${search}?userId=${getUserId()}`
             );
 
             const data = await response.json();
 
             users = data;
+
+        } catch(error) {
+
+            console.log(error);
+
+        }
+
+    }
+
+    async function loadRequests() {
+
+        try {
+
+            const userId = getUserId();
+
+            const response = await fetch(
+                `http://localhost:3000/users/requests/${userId}`
+            );
+
+            const data = await response.json();
+
+            requests = data;
+
+        } catch(error) {
+
+            console.log(error);
+
+        }
+
+    }
+
+    async function loadFriends() {
+
+        try {
+
+            const userId = getUserId();
+
+            const response = await fetch(
+                `http://localhost:3000/users/friends/${userId}`
+            );
+
+            const data = await response.json();
+
+            friends = data;
+
+        } catch(error) {
+
+            console.log(error);
+
+        }
+
+    }
+
+    async function sendFriendRequest(receiverId) {
+
+        try {
+
+            const senderId = getUserId();
+
+            console.log('sender', senderId);
+            console.log('receiver', receiverId);
+
+            const response = await fetch(
+                'http://localhost:3000/users/request',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        sender_id: senderId,
+                        receiver_id: receiverId
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            console.log(data);
+
+        } catch(error) {
+
+            console.log(error);
+
+        }
+
+    }
+
+    async function acceptRequest(request) {
+
+        try {
+
+            const userId = getUserId();
+
+            const response = await fetch(
+                'http://localhost:3000/users/accept',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        request_id: request.id,
+                        user_id: userId,
+                        friend_id: request.user_id
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            console.log(data);
+
+            loadRequests();
+	        loadFriends();
 
         } catch(error) {
 
@@ -169,64 +305,145 @@
                     onclick={() => tab = 'add'}
                 >
                     Adden
+                        {#if requests.length > 0}
+                            (+{requests.length})
+                        {/if}
                 </button>
 
             </div>
 
             {#if tab === 'contacts'}
 
-    <div class="empty-chats">
+                {#if friends.length === 0}
 
-        <div class="empty-icon">
-            💬
-        </div>
+                <div class="empty-chats">
 
-        <h3>Keine Kontakte</h3>
+                    <div class="empty-icon">
+                        💬
+                    </div>
 
-        <p>
-            Füge neue User hinzu um einen Chat zu starten
-        </p>
+                    <h3>Keine Kontakte</h3>
 
-    </div>
+                    <p>
+                        Füge neue User hinzu um einen Chat zu starten
+                    </p>
 
-{:else}
+                </div>
 
-    <div class="search-box">
+            {:else}
 
-        <input
-            bind:value={search}
-            type="text"
-            placeholder="User suchen..."
-            oninput={searchUsers}
-        />
+                {#each friends as friend}
 
-    </div>
+                    <div class="chat-item">
 
-    {#each users as user}
+                        <div class="avatar">
+                            {friend.username[0]}
+                        </div>
 
-        <div class="chat-item">
+                        <div class="chat-info">
 
-            <div class="avatar">
-                {user.username[0]}
-            </div>
+                            <h3>{friend.username}</h3>
 
-            <div class="chat-info">
+                            <p>Kontakt</p>
 
-                <h3>{user.username}</h3>
+                        </div>
 
-                <p>User gefunden</p>
+                    </div>
 
-            </div>
+                {/each}
 
-            <button class="add-user">
-                +
-            </button>
+            {/if}
 
-        </div>
+            {:else}
 
-    {/each}
+                {#if requests.length > 0}
 
-    {/if}
+                    <div class="request-section">
+
+                        <h4>Anfragen</h4>
+
+                        {#each requests as request}
+
+                            <div class="chat-item">
+
+                                <div class="avatar">
+                                    {request.username[0]}
+                                </div>
+
+                                <div class="chat-info">
+
+                                    <h3>{request.username}</h3>
+
+                                    <p>möchte dich adden</p>
+
+                                </div>
+
+                                <button
+                                    class="add-user"
+                                    onclick={() => acceptRequest(request)}
+                                >
+                                    ✓
+                                </button>
+
+                            </div>
+
+                        {/each}
+
+                    </div>
+
+                    <div class="divider"></div>
+
+                {/if}
+
+                <div class="search-box">
+
+                    <input
+                        bind:value={search}
+                        type="text"
+                        placeholder="User suchen..."
+                        oninput={searchUsers}
+                    />
+
+                </div>
+
+                {#each users as user}
+
+                    <div class="chat-item">
+
+                        <div class="avatar">
+                            {user.username[0]}
+                        </div>
+
+                        <div class="chat-info">
+
+                            <h3>{user.username}</h3>
+
+                            <p>User gefunden</p>
+
+                        </div>
+
+                        {#if user.is_friend || user.requested}
+
+                            <div class="added-user">
+                                ✓
+                            </div>
+
+                        {:else}
+
+                            <button
+                                class="add-user"
+                                onclick={() => sendFriendRequest(user.id)}
+                            >
+                                +
+                            </button>
+
+                        {/if}
+
+                    </div>
+
+                {/each}
+
+            {/if}
         </div>
 
         <!-- CHAT -->
@@ -334,6 +551,30 @@
         align-items: center;
 
         box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    }
+
+    .request-section h4 {
+
+        margin-bottom: 18px;
+
+        color: #6b7280;
+
+        font-size: 13px;
+
+        text-transform: uppercase;
+
+        letter-spacing: 1px;
+
+    }
+
+    .divider {
+
+        height: 1px;
+
+        background: #e5e7eb;
+
+        margin: 20px 0;
+
     }
 
     .empty-chat {

@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { saveUser  } from '$lib/components/auth';
 
 
 	let username = $state('');
@@ -17,6 +18,15 @@
 				})
 			}
 		)
+
+		const data = await response.json();
+
+		saveUser({
+			id: data.userId,
+			username: data.username
+		});
+
+
 
 
 		goto('/dashboard');
