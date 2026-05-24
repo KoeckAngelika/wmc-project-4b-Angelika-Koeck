@@ -15,6 +15,48 @@
 
 	let unit = 'Minuten';
 
+	const taskId = $derived.by(() => {
+
+		if(!page.url) {
+			return null;
+		}
+
+		return page.url.searchParams.get('id');
+
+	});
+
+	$effect(() => {
+
+		if(taskId) {
+			loadTask();
+		}
+
+	});
+
+	async function loadTask() {
+
+		try {
+
+			const response = await fetch(
+				`http://localhost:3000/tasks/single/${taskId}`
+			);
+
+			const data = await response.json();
+
+			console.log(data);
+
+			activity = data.title;
+			duration = data.duration_min;
+			repeat = data.description;
+
+		} catch(error) {
+
+			console.log(error);
+
+		}
+
+	}
+
 	const selectedDate = $derived.by(() => {
 
 		if(!page.url) {
@@ -46,6 +88,10 @@
 
 	async function addActivity() {
 
+		if(taskId) {
+			updateTask();
+			return;
+		}
 		try {
 
 			const response = await fetch(
@@ -81,6 +127,41 @@
 		}
 
 		gotToDashboard();
+
+	}
+
+	async function updateTask() {
+
+		try {
+
+			const response = await fetch(
+				`http://localhost:3000/tasks/${taskId}`,
+				{
+					method: 'PUT',
+
+					headers: {
+						'Content-Type': 'application/json'
+					},
+
+					body: JSON.stringify({
+						name: activity,
+						duration,
+						repeat
+					})
+				}
+			);
+
+			const data = await response.json();
+
+			console.log(data);
+
+			goto('/dashboard');
+
+		} catch(error) {
+
+			console.log(error);
+
+		}
 
 	}
 
@@ -179,7 +260,11 @@
 				class="add-btn"
 				onclick={addActivity}
 			>
-				Hinzufügen
+				{#if taskId}
+					Speichern
+				{:else}
+					Hinzufügen
+				{/if}
 			</button>
 
 		</div>

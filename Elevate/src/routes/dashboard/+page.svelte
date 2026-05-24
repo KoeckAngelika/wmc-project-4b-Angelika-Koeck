@@ -316,7 +316,6 @@
 
 			<div class="buttons">
 				<button onclick={goToCreateActivity} class="add">Hinzufügen</button>
-				<button class="edit">Bearbeiten</button>
 			</div>
 		</div>
 
@@ -377,24 +376,69 @@
 
 	}
 
+	.edit-task,
 	.delete-task {
 
-		width: 42px;
-		height: 42px;
+		width: 44px;
+		height: 44px;
 
 		border: none;
 
-		border-radius: 14px;
+		border-radius: 16px;
 
-		background: #fee2e2;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 
-		color: #dc2626;
-
-		font-size: 18px;
+		font-size: 17px;
 
 		cursor: pointer;
 
-		transition: 0.2s;
+		transition:
+			transform 0.2s,
+			background 0.2s,
+			box-shadow 0.2s;
+
+		backdrop-filter: blur(10px);
+
+		box-shadow:
+			0 4px 10px rgba(0,0,0,0.05);
+
+	}
+
+	.edit-task {
+
+		background: #eef2ff;
+		color: #4f46e5;
+
+	}
+
+	.edit-task:hover {
+
+		background: #dbe4ff;
+
+		transform: translateY(-2px);
+
+		box-shadow:
+			0 10px 18px rgba(79,70,229,0.15);
+
+	}
+
+	.delete-task {
+
+		background: #fff1f2;
+		color: #e11d48;
+
+	}
+
+	.delete-task:hover {
+
+		background: #ffe4e6;
+
+		transform: translateY(-2px);
+
+		box-shadow:
+			0 10px 18px rgba(225,29,72,0.15);
 
 	}
 

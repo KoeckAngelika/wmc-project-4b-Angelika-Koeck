@@ -150,4 +150,68 @@ router.get("/single/:id", (req, res) => {
 
 });
 
+router.get("/single/:id", (req, res) => {
+
+	const id = req.params.id;
+
+	const sql = `
+		SELECT *
+		FROM activities
+		WHERE id = ?
+	`;
+
+	db.get(sql, [id], (err, row) => {
+
+		if(err) {
+			return res.status(500).json(err);
+		}
+
+		res.json(row);
+
+	});
+
+});
+
+router.put("/:id", (req, res) => {
+
+	const id = req.params.id;
+
+	const {
+		name,
+		duration,
+		repeat
+	} = req.body;
+
+	const sql = `
+		UPDATE activities
+		SET
+			title = ?,
+			description = ?,
+			duration_min = ?
+		WHERE id = ?
+	`;
+
+	db.run(
+		sql,
+		[
+			name,
+			repeat,
+			duration,
+			id
+		],
+		function(err) {
+
+			if(err) {
+				return res.status(500).json(err);
+			}
+
+			res.json({
+				success: true
+			});
+
+		}
+	);
+
+});
+
 module.exports = router;
