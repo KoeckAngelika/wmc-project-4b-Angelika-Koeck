@@ -1,6 +1,9 @@
 <script>
 
 	import { goto } from '$app/navigation';
+    import { io } from 'socket.io-client';
+
+    const socket = io('http://localhost:3000');
 
 	function goToDashboard(){
 		goto('/dashboard');
@@ -15,25 +18,68 @@
 		goto('/settings');
 	}
 
-    //Dummy Daten vom Chat
-    const messages = [
-        {
-            user: 'Coach',
-            text: 'Hey Jonas 👋 Wie läuft dein Training heute?',
-            ai: true
-        },
-        {
-            user: 'Du',
-            text: 'Ganz gut, aber meine Motivation ist gerade low 😅',
-            ai: false
-        },
-        {
-            user: 'Coach',
-            text: 'Das ist normal. Versuch heute einfach klein anzufangen 💪',
-            ai: true
-        }
-    ];
+    let messages = $state([]);
+
     let mobileMenu = $state(false);
+    let newMessage = $state('');
+
+    let search = $state('');
+    let users = $state([]);
+
+    let tab = $state('contacts');
+
+    $effect(() => {
+
+        socket.on('receive_message', (message) => {
+
+            messages = [...messages, message];
+
+        });
+
+    });
+
+    function sendMessage() {
+
+        if(!newMessage.trim()) {
+            return;
+        }
+
+        const message = {
+            user: 'Du',
+            text: newMessage,
+            ai: false
+        };
+
+        socket.emit('send_message', message);
+
+        newMessage = '';
+
+    }
+
+    async function searchUsers() {
+
+        if(!search.trim()) {
+            users = [];
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                `http://localhost:3000/users/search/${search}`
+            );
+
+            const data = await response.json();
+
+            users = data;
+
+        } catch(error) {
+
+            console.log(error);
+
+        }
+
+    }
 </script>
 
 <div class="page">
@@ -109,36 +155,95 @@
 
         <div class="sidebar">
             <h2>Chats</h2>
+            <div class="chat-tabs">
 
-            <div class="chat-item active-chat">
-                <div class="avatar">C</div>
-                <div>
-                    <h3>Coach</h3>
-                    <p>Online</p>
-                </div>
+                <button
+                    class:active-tab={tab === 'contacts'}
+                    onclick={() => tab = 'contacts'}
+                >
+                    Kontakte
+                </button>
+
+                <button
+                    class:active-tab={tab === 'add'}
+                    onclick={() => tab = 'add'}
+                >
+                    Adden
+                </button>
+
             </div>
 
-            <div class="chat-item">
-                <div class="avatar gray">M</div>
-                <div>
-                    <h3>Max</h3>
-                    <p>Zuletzt aktiv</p>
-                </div>
+            {#if tab === 'contacts'}
+
+    <div class="empty-chats">
+
+        <div class="empty-icon">
+            💬
+        </div>
+
+        <h3>Keine Kontakte</h3>
+
+        <p>
+            Füge neue User hinzu um einen Chat zu starten
+        </p>
+
+    </div>
+
+{:else}
+
+    <div class="search-box">
+
+        <input
+            bind:value={search}
+            type="text"
+            placeholder="User suchen..."
+            oninput={searchUsers}
+        />
+
+    </div>
+
+    {#each users as user}
+
+        <div class="chat-item">
+
+            <div class="avatar">
+                {user.username[0]}
             </div>
+
+            <div class="chat-info">
+
+                <h3>{user.username}</h3>
+
+                <p>User gefunden</p>
+
+            </div>
+
+            <button class="add-user">
+                +
+            </button>
+
+        </div>
+
+    {/each}
+
+    {/if}
         </div>
 
         <!-- CHAT -->
         <div class="chat-box">
 
-            <div class="chat-header">
-                <div class="chat-user">
-                    <div class="big-avatar">C</div>
+            <div class="empty-chat">
 
-                    <div>
-                        <h3>Coach</h3>
-                        <p>Fitness Assistent</p>
-                    </div>
+                <div class="empty-chat-icon">
+                    💬
                 </div>
+
+                <h2>Kein Chat ausgewählt</h2>
+
+                <p>
+                    Wähle einen Kontakt oder füge neue Freunde hinzu
+                </p>
+
             </div>
 
             <div class="messages">
@@ -154,11 +259,19 @@
 
             <div class="input-area">
                 <input
+                    bind:value={newMessage}
                     type="text"
                     placeholder="Nachricht schreiben..."
+                    onkeydown={(e) => {
+                        if(e.key === 'Enter') {
+                            sendMessage();
+                        }
+                    }}
                 />
 
-                <button>Senden</button>
+                <button onclick={sendMessage}>
+                    Senden
+                </button>
             </div>
         </div>
     </div>
@@ -221,6 +334,229 @@
         align-items: center;
 
         box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    }
+
+    .empty-chat {
+
+        flex: 1;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        text-align: center;
+
+        padding: 40px;
+
+    }
+
+    .empty-chat-icon {
+
+        width: 120px;
+        height: 120px;
+
+        border-radius: 36px;
+
+        background: #eef2ff;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 52px;
+
+        margin-bottom: 30px;
+
+    }
+
+    .empty-chat h2 {
+
+        margin: 0;
+
+        font-size: 30px;
+
+        color: #111827;
+
+    }
+
+    .empty-chat p {
+
+        margin-top: 14px;
+
+        font-size: 16px;
+
+        line-height: 1.7;
+
+        color: #6b7280;
+
+        max-width: 320px;
+
+    }
+
+    .empty-chats {
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        text-align: center;
+
+        padding-top: 80px;
+
+    }
+
+    .empty-icon {
+
+        width: 80px;
+        height: 80px;
+
+        border-radius: 26px;
+
+        background: #eef2ff;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 34px;
+
+        margin-bottom: 24px;
+
+    }
+
+    .empty-chats h3 {
+
+        margin: 0;
+
+        font-size: 20px;
+
+        color: #111827;
+
+    }
+
+    .empty-chats p {
+
+        margin-top: 12px;
+
+        font-size: 14px;
+
+        line-height: 1.6;
+
+        color: #6b7280;
+
+        max-width: 220px;
+
+    }
+
+    .chat-tabs {
+
+        display: flex;
+
+        gap: 10px;
+
+        margin-bottom: 24px;
+
+    }
+
+    .chat-tabs button {
+
+        flex: 1;
+
+        height: 48px;
+
+        border: none;
+
+        border-radius: 16px;
+
+        background: #f3f4f6;
+
+        color: #6b7280;
+
+        font-size: 14px;
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+
+    }
+
+    .chat-tabs button:hover {
+
+        background: #e5e7eb;
+
+    }
+
+    .active-tab {
+
+        background: #e0e7ff !important;
+
+        color: #4f46e5 !important;
+
+    }
+
+    .search-box {
+
+        margin-bottom: 22px;
+
+    }
+
+    .search-box input {
+
+        width: 100%;
+
+        height: 54px;
+
+        border: none;
+        outline: none;
+
+        border-radius: 18px;
+
+        background: #f3f4f6;
+
+        padding: 0 20px;
+
+        font-size: 14px;
+
+    }
+
+    .chat-info {
+
+        flex: 1;
+
+    }
+
+    .add-user {
+
+        width: 38px;
+        height: 38px;
+
+        border: none;
+
+        border-radius: 14px;
+
+        background: #e0e7ff;
+
+        color: #4f46e5;
+
+        font-size: 22px;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+
+    }
+
+    .add-user:hover {
+
+        transform: scale(1.08);
+
+        background: #c7d2fe;
+
     }
 
     .logo {

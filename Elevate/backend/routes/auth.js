@@ -6,10 +6,12 @@ const bcrypt = require("bcrypt");
 const db = require("../db");
 
 
-// REGISTER
+/* ------------------- */
+/* REGISTER */
+/* ------------------- */
+
 router.post("/register", async (req, res) => {
 
-    console.log("gefunden")
     try {
 
         const {
@@ -21,18 +23,25 @@ router.post("/register", async (req, res) => {
             weight_kg
         } = req.body;
 
+        /* Zahlen umwandeln */
 
-        // Passwort hashen
+        const parsedHeight = Number(height_cm);
+        const parsedWeight = Number(weight_kg);
+
+        /* Passwort hashen */
+
         const hashedPassword = await bcrypt.hash(
             password,
             10
         );
 
+        /* SQL */
+
         const sql = `
             INSERT INTO users (
                 email,
                 username,
-                password_hash,
+                password,
                 birthdate,
                 height_cm,
                 weight_kg
@@ -52,21 +61,31 @@ router.post("/register", async (req, res) => {
             ],
             function(err) {
 
-                if (err) {
+                if(err) {
+
+                    console.log(err);
+
                     return res.status(500).json(err);
+
                 }
 
                 res.json({
+                    success: true,
                     message: "Benutzer erstellt",
                     userId: this.lastID
                 });
+
             }
         );
 
     } catch(error) {
 
+        console.log(error);
+
         res.status(500).json(error);
+
     }
+
 });
 
 module.exports = router;

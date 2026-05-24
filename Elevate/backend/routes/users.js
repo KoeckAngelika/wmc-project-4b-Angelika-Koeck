@@ -48,6 +48,29 @@ router.post("/login", (req, res) => {
         });
 });
 
+router.get("/search/:username", (req, res) => {
+
+	const username = req.params.username;
+
+	const sql = `
+		SELECT id, username
+		FROM users
+		WHERE username LIKE ?
+		LIMIT 10
+	`;
+
+	db.all(sql, [`%${username}%`], (err, rows) => {
+
+		if(err) {
+			return res.status(500).json(err);
+		}
+
+		res.json(rows);
+
+	});
+
+});
+
 
 
 module.exports = router;
