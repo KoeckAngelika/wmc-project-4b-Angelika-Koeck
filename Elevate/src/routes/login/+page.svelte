@@ -25,11 +25,13 @@
 			id: data.userId,
 			username: data.username
 		});
+		
 
-
-
-
-		goto('/dashboard');
+		if(!data){
+			alert("Falsche Anmeldedaten");
+		}else{
+			goto('/dashboard');
+		}
 	}
 </script>
 

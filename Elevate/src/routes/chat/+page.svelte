@@ -25,6 +25,7 @@
 
     let mobileMenu = $state(false);
     let newMessage = $state('');
+    let selectedFriend = $state(null);
 
     let search = $state('');
     let users = $state([]);
@@ -54,24 +55,6 @@
         });
 
     });
-
-    function sendMessage() {
-
-        if(!newMessage.trim()) {
-            return;
-        }
-
-        const message = {
-            user: 'Du',
-            text: newMessage,
-            ai: false
-        };
-
-        socket.emit('send_message', message);
-
-        newMessage = '';
-
-    }
 
     async function searchUsers() {
 
@@ -111,6 +94,32 @@
             const data = await response.json();
 
             requests = data;
+
+        } catch(error) {
+
+            console.log(error);
+
+        }
+
+    }
+
+    async function loadMessages(friendId) {
+
+        try {
+
+            const userId = getUserId();
+
+            const response = await fetch(
+                `http://localhost:3000/chat/load-messages/${userId}/${friendId}`
+            );
+
+            const data = await response.json();
+
+            messages = data.map(msg => ({
+                user: msg.sender_id == userId ? 'Du' : 'Freund',
+                text: msg.message,
+                ai: msg.sender_id != userId
+            }));
 
         } catch(error) {
 
@@ -208,6 +217,60 @@
 
             loadRequests();
 	        loadFriends();
+
+        } catch(error) {
+
+            console.log(error);
+
+        }
+
+    }
+
+    async function sendMessage() {
+
+        if(!newMessage.trim()) {
+            return;
+        }
+
+        if(!selectedFriend) {
+            alert('Wähle einen Chat aus');
+            return;
+        }
+
+        try {
+
+            const senderId = getUserId();
+
+            const messageData = {
+                sender_id: senderId,
+                receiver_id: selectedFriend.id,
+                message: newMessage
+            };
+
+            await fetch(
+                'http://localhost:3000/chat/save-message',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify(messageData)
+                }
+            );
+
+            messages = [
+                ...messages,
+                {
+                    user: 'Du',
+                    text: newMessage,
+                    ai: false
+                }
+            ];
+
+
+            newMessage = '';
 
         } catch(error) {
 
@@ -334,7 +397,19 @@
 
                 {#each friends as friend}
 
-                    <div class="chat-item">
+                    <div
+                        class:active-chat={selectedFriend?.id === friend.id}
+                        class="chat-item"
+                        role="button"
+                        tabindex="0"
+                        onclick={() => {
+
+                            selectedFriend = friend;
+
+                            loadMessages(friend.id);
+
+                        }}
+                    >
 
                         <div class="avatar">
                             {friend.username[0]}
@@ -449,19 +524,22 @@
         <!-- CHAT -->
         <div class="chat-box">
 
-            <div class="empty-chat">
+            {#if !selectedFriend}
 
-                <div class="empty-chat-icon">
-                    💬
+                <div class="empty-chat">
+
+                    <div class="empty-chat-icon">
+                        💬
+                    </div>
+
+                    <h2>Kein Chat ausgewählt</h2>
+
+                    <p>
+                        Wähle einen Kontakt oder füge neue Freunde hinzu
+                    </p>
+
                 </div>
-
-                <h2>Kein Chat ausgewählt</h2>
-
-                <p>
-                    Wähle einen Kontakt oder füge neue Freunde hinzu
-                </p>
-
-            </div>
+            {/if}
 
             <div class="messages">
                 {#each messages as msg}

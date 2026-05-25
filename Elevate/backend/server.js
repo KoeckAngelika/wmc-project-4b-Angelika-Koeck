@@ -12,11 +12,12 @@ app.use(express.json());
 const userRoutes = require("./routes/users");
 const authRoutes = require("./routes/auth");
 const activityRoutes = require('./routes/activities');
+const chatRoutes = require('./routes/messages');
 
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use('/tasks', activityRoutes);
-app.use("/users", userRoutes);
+app.use('/chat', chatRoutes);
 
 app.get("/", (req, res) => {
     res.send("Backend läuft");
@@ -34,11 +35,24 @@ io.on("connection", (socket) => {
 
 	console.log("User verbunden");
 
+	// User Raum beitreten
+	socket.on("join", (userId) => {
+
+		socket.join(userId.toString());
+
+		console.log("User joined:", userId);
+
+	});
+
+	// Nachricht senden
 	socket.on("send_message", (message) => {
 
 		console.log(message);
 
-		io.emit("receive_message", message);
+		io.to(message.receiver_id.toString()).emit(
+			"receive_message",
+			message
+		);
 
 	});
 
