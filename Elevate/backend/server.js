@@ -13,11 +13,13 @@ const userRoutes = require("./routes/users");
 const authRoutes = require("./routes/auth");
 const activityRoutes = require('./routes/activities');
 const chatRoutes = require('./routes/messages');
+const statisticsRoutes = require("./routes/statistics");
 
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use('/tasks', activityRoutes);
 app.use('/chat', chatRoutes);
+app.use("/statistics", statisticsRoutes);
 
 app.get("/", (req, res) => {
     res.send("Backend läuft");

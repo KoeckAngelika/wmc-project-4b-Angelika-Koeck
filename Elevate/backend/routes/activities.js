@@ -89,23 +89,87 @@ router.patch("/:id/toggle", (req, res) => {
 
 	const id = req.params.id;
 
-	const sql = `
-		UPDATE activities
-		SET completed = NOT completed
+	// activity holen
+	db.get(
+		`
+		SELECT *
+		FROM activities
 		WHERE id = ?
-	`;
+		`,
+		[id],
+		(err, activity) => {
 
-	db.run(sql, [id], function(err) {
+			if(err) {
+				return res.status(500).json(err);
+			}
 
-		if(err) {
-			return res.status(500).json(err);
+			if(!activity) {
+				return res.status(404).json({
+					error: "Activity not found"
+				});
+			}
+
+			// completed toggeln
+			db.run(
+				`
+				UPDATE activities
+				SET completed = NOT completed
+				WHERE id = ?
+				`,
+				[id],
+				function(err) {
+
+					if(err) {
+						return res.status(500).json(err);
+					}
+
+					// nur wenn task gerade abgeschlossen wurde
+					if(activity.completed === 0) {
+
+						const today = activity.activity_date;
+
+						// statistik updaten
+						db.run(
+							`
+							INSERT INTO statistics (
+								user_id,
+								stat_date,
+								steps,
+								calories_burned
+							)
+							VALUES (?, ?, ?, ?)
+
+							ON CONFLICT(user_id, stat_date)
+							DO UPDATE SET
+								steps = steps + excluded.steps,
+								calories_burned = calories_burned + excluded.calories_burned
+							`,
+							[
+								activity.user_id,
+								today,
+								4000,
+								300
+							],
+							(err) => {
+
+								if(err) {
+									console.log(err);
+								}
+
+							}
+						);
+
+					}
+
+					res.json({
+						success: true
+					});
+
+				}
+			);
+
 		}
-
-		res.json({
-			success: true
-		});
-
-	});
+	);
 
 });
 

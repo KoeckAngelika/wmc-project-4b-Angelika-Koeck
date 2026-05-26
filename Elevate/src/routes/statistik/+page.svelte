@@ -1,6 +1,7 @@
 <script>
 
 	import { goto } from '$app/navigation';
+    import { getUserId } from '$lib/components/auth';
 
 	function goToDashboard(){
 		goto('/dashboard');
@@ -10,31 +11,83 @@
 		goto('/chat');
 	}
     
-	
 	function goToSettings(){
 		goto('/settings');
 	}
 
-    //Dummy Daten vom Chat
-    const messages = [
-        {
-            user: 'Coach',
-            text: 'Hey Jonas 👋 Wie läuft dein Training heute?',
-            ai: true
-        },
-        {
-            user: 'Du',
-            text: 'Ganz gut, aber meine Motivation ist gerade low 😅',
-            ai: false
-        },
-        {
-            user: 'Coach',
-            text: 'Das ist normal. Versuch heute einfach klein anzufangen 💪',
-            ai: true
-        }
-    ];
-
     let mobileMenu = $state(false);
+
+    let stats = $state([]);
+    let selectedStat = $state(null);
+
+    async function loadStats(){
+
+        try{
+
+            const userId = getUserId();
+
+            const res = await fetch(
+                `http://localhost:3000/statistics/${userId}`
+            );
+
+            const data = await res.json();
+
+            if(data.length > 0){
+
+                const latest = data[data.length - 1];
+
+                stats = [
+
+                    {
+                        id: "steps",
+                        title: "Schritte",
+                        short: "S",
+                        color: "#4f46e5",
+                        value: latest.steps,
+                        percent: "+12%",
+                        days: `${latest.steps} Schritte`,
+                        active: "Heute aktiv",
+                        extra: "Workout"
+                    },
+
+                    {
+                        id: "calories",
+                        title: "Kalorien",
+                        short: "K",
+                        color: "#22c55e",
+                        value: latest.calories_burned,
+                        percent: "+8%",
+                        days: `${latest.calories_burned} kcal`,
+                        active: "Verbrannt",
+                        extra: "Sehr gut"
+                    },
+
+                    {
+                        id: "weight",
+                        title: "Gewicht",
+                        short: "G",
+                        color: "#ef4444",
+                        value: latest.weight_kg || 0,
+                        percent: "0%",
+                        days: `${latest.weight_kg || 0} kg`,
+                        active: "Aktuelles Gewicht",
+                        extra: "Stabil"
+                    }
+
+                ];
+
+                selectedStat = stats[0];
+
+            }
+
+        }catch(err){
+            console.log(err);
+        }
+
+    }
+
+    loadStats();
+
 </script>
 
 <div class="page">
@@ -107,35 +160,32 @@
     <div class="content">
 
         <div class="sidebar">
+
             <h2>Kategorien</h2>
 
-            <div class="chat-item active-chat">
-                <div class="avatar">C</div>
-                <div>
-                    <h3>Kalorien</h3>
-                </div>
-            </div>
+            {#each stats as stat}
 
-            <div class="chat-item">
-                <div class="avatar gray">M</div>
-                <div>
-                    <h3>Gewicht</h3>
-                </div>
-            </div>
+                <div
+                    class:selected-card={selectedStat?.id === stat.id}
+                    class="chat-item"
+                    onclick={() => selectedStat = stat}
+                >
 
-            <div class="chat-item">
-                <div class="avatar gray">M</div>
-                <div>
-                    <h3>Trainingszeit</h3>
-                </div>
-            </div>
+                    <div
+                        class="avatar"
+                        style={`background:${stat.color}20; color:${stat.color}`}
+                    >
+                        {stat.short}
+                    </div>
 
-            <div class="chat-item">
-                <div class="avatar gray">M</div>
-                <div>
-                    <h3>Fitness Score</h3>
+                    <div>
+                        <h3>{stat.title}</h3>
+                    </div>
+
                 </div>
-            </div>
+
+            {/each}
+
         </div>
 
         <!-- STATISTIK -->
@@ -143,15 +193,15 @@
 
             <div class="stats-header">
                 <div>
-                    <h2>Kalorien</h2>
+                    <h2>{selectedStat?.title}</h2>                   
                     <p>deine letzten 10 Tage</p>
                 </div>
             </div>
 
             <div class="stats-main">
                 <div class="stats-left">
-                    <h1>2.340</h1>
-                    <span>+12% mehr als letzte Woche</span>
+                    <h1>{selectedStat?.value}</h1>
+                    <span>{selectedStat?.percent}</span>
                 </div>
 
                 <div class="graph">
@@ -159,20 +209,17 @@
                     <svg viewBox="0 0 900 320" class="chart">
 
                         <path
-                            d="M60 240 
-                            C140 180, 220 210, 300 150
-                            S460 120, 520 90
-                            S700 80, 820 20"
+                            d="M60 240 L300 150 L520 90 L820 20"
                             fill="none"
-                            stroke="#7c83ff"
-                            stroke-width="10"
+                            stroke={selectedStat?.color}
+                            stroke-width="8"
                             stroke-linecap="round"
                         />
 
-                        <circle cx="60" cy="240" r="10" fill="#7c83ff"/>
-                        <circle cx="300" cy="150" r="10" fill="#7c83ff"/>
-                        <circle cx="520" cy="90" r="10" fill="#7c83ff"/>
-                        <circle cx="820" cy="20" r="10" fill="#7c83ff"/>
+                        <circle cx="60" cy="240" r="10" fill={selectedStat?.color}/>
+                        <circle cx="300" cy="150" r="10" fill={selectedStat?.color}/>
+                        <circle cx="520" cy="90" r="10" fill={selectedStat?.color}/>
+                        <circle cx="820" cy="20" r="10" fill={selectedStat?.color}/>
 
                     </svg>
 
@@ -182,15 +229,15 @@
             <div class="bottom-cards">
 
                 <div class="mini-card blue">
-                    Ø 2.1k täglich
+                    {selectedStat?.days}
                 </div>
 
                 <div class="mini-card green">
-                    5 Tage aktiv
+                    {selectedStat?.active}
                 </div>
 
                 <div class="mini-card red">
-                    -340 kcal
+                    {selectedStat?.extra}
                 </div>
 
             </div>
@@ -256,6 +303,15 @@
         justify-content: space-between;
 
         box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    }
+
+    .selected-card{
+        background:#eef2ff;
+        border:2px solid #c7d2fe;
+    }
+
+    .selected-card:hover{
+        background:#eef2ff;
     }
 
     .logo {
