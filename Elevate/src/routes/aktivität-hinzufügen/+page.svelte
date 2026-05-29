@@ -8,6 +8,10 @@
 		getUser,
 		getUserId
 	} from '$lib/components/auth';
+	import { translations } from '$lib/i18n';
+	import { languageState } from '$lib/language.svelte.js';
+
+let t = $derived(translations[languageState.language]);
 
 	let userId = $state(null);
 	let user = $state(null);
@@ -80,18 +84,16 @@
 
 		const value = Number(duration || 0);
 
-		let timeText = `${value} ${unit}`;
-
+		let timeText = `${value} ${t.minutes}`;
 		if(unit === 'Minuten' && value >= 60) {
 
 			const hours = (value / 60).toFixed(1);
 
-			timeText = `${hours} Stunden`;
+			timeText = `${hours} ${t.hours}`;;
 
 		}
 
-		return `${timeText} ${activity || 'Joggen'} · ${repeat || '10 mal'}`;
-
+		return `${timeText} ${activity || t.jogging} · ${repeat || `10 ${t.times}`}`;
 	});
 	
 
@@ -197,12 +199,12 @@
 		<!-- Aktivität -->
 		<div class="input-group">
 
-			<label>Aktivität</label>
+			<label>{t.activity}</label>
 
 			<input
 				bind:value={activity}
 				type="text"
-				placeholder="z.B. Joggen"
+				placeholder={t.exampleJogging}
 			/>
 
 		</div>
@@ -210,7 +212,7 @@
 		<!-- Dauer -->
 		<div class="input-group">
 
-			<label>Dauer</label>
+			<label>{t.duration}</label>
 
 			<div class="duration-row">
 
@@ -224,7 +226,7 @@
 					class="unit-btn"
 					type="button"
 				>
-					{unit}
+					{t.minutes}
 				</button>
 
 			</div>
@@ -234,12 +236,12 @@
 		<!-- Wiederholung -->
 		<div class="input-group">
 
-			<label>Wiederholung</label>
+			<label>{t.repeat}</label>
 
 			<input
 				bind:value={repeat}
 				type="text"
-				placeholder="z.B. 10 mal"
+				placeholder={t.exampleRepeat}
 			/>
 
 		</div>
@@ -247,7 +249,7 @@
 		<!-- Vorschau -->
 		<div class="input-group">
 
-			<label>Vorschau</label>
+			<label>{t.preview}</label>
 
 			<div class="preview">
 				{preview}
@@ -262,7 +264,7 @@
 				class="cancel-btn"
 				onclick={cancel}
 			>
-				Abbrechen
+				{t.cancel}
 			</button>
 
 			<button
@@ -270,9 +272,9 @@
 				onclick={addActivity}
 			>
 				{#if taskId}
-					Speichern
+					{t.save}
 				{:else}
-					Hinzufügen
+					{t.add}
 				{/if}
 			</button>
 

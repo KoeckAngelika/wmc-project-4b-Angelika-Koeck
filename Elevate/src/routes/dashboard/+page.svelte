@@ -5,6 +5,27 @@
 		getUserId
 	} from '$lib/components/auth';
 
+	import { translations } from '$lib/i18n';
+	import { languageState } from '$lib/language.svelte.js';
+
+	let t = $derived(translations[languageState.language]);
+
+		
+	let userId = $state(null);
+	let user = $state(null);
+
+	$effect(() => {
+
+		user = getUser();
+
+		userId = getUserId();
+
+		if(userId) {
+			loadTasks();
+		}
+
+	});
+
 	function goToChat(){
 		goto('/chat');
 	}
@@ -35,8 +56,7 @@
 
 	}
 
-	let userId = $state(null);
-	let user = $state(null);
+	
 	let tasks = $state([]);
 
 	let selectedDate = $state(new Date());
@@ -76,17 +96,7 @@
 
 	}
 
-	$effect(() => {
-
-		user = getUser();
-
-		userId = getUserId();
-
-		if(userId) {
-			loadTasks();
-		}
-
-	});
+	
 
 	function previousDay() {
 
@@ -189,7 +199,7 @@
 					mobileMenu = false;
 				}}
 			>
-				Dashboard
+				{t.dashboard}
 			</button>
 
 			<button
@@ -198,7 +208,7 @@
 					mobileMenu = false;
 				}}
 			>
-				Chat
+				{t.chat}
 			</button>
 
 			<button
@@ -207,7 +217,7 @@
 					mobileMenu = false;
 				}}
 			>
-				Statistik
+				{t.statistics}
 			</button>
 
 			<button
@@ -217,20 +227,21 @@
 					mobileMenu = false;
 				}}
 			>
-				Einstellungen
+				{t.settings}
 			</button>
 
 		</div>
 
 		<div class="nav-right">
-			<button onclick={goToSettings} class="settings">⚙</button>			<div class="profile">A</div>
+			<button onclick={goToSettings} class="settings">⚙</button>			
+			<div class="profile">{user?.username.charAt(0).toUpperCase() || 'U'}</div>
 		</div>
 	</nav>
 
 
 	<section class="hero">
-		<h1>Guten Morgen, {user?.username || 'User'}</h1>
-		<p>dein Überblick für heute</p>
+		<h1>{t.goodMorning}, {user?.username || 'User'}</h1>
+		<p>{t.todayOverview}</p>
 	</section>
 
 	<div class="content">
@@ -273,7 +284,7 @@
 								<h3>{task.title}</h3>
 
 								<p>
-									{task.duration_min} Minuten
+									{task.duration_min} {t.minutes}
 								</p>
 
 							</div>
@@ -285,9 +296,9 @@
 						<div class:done-pill={task.completed} class="status-pill">
 
 							{#if task.completed}
-								Erledigt
+								{t.completed}
 							{:else}
-								Offen
+								{t.pending}
 							{/if}
 
 						</div>
@@ -316,7 +327,7 @@
 
 			<div class="progress-section">
 				<div class="progress-head">
-					<p>Tagesfortschritt</p>
+					<p>{t.dailyProgress}</p>
 					<span>{progress}%</span>				
 				</div>
 
@@ -329,20 +340,20 @@
 			</div>
 
 			<div class="buttons">
-				<button onclick={goToCreateActivity} class="add">Hinzufügen</button>
+				<button onclick={goToCreateActivity} class="add">{t.add}</button>
 			</div>
 		</div>
 
 		<div class="side-card">
-			<h3>Dein Ziel</h3>
-			<p>Bleibe diese Woche aktiv und erreiche deine tägliche Routine.</p>
+			<h3>{t.yourGoal}</h3>
+			<p>{t.goalDescription}</p>
 
 			<div class="circle">
 				{progress}%
 			</div>
 
 			<button class="motivation">
-				Motivation ansehen
+				{t.viewMotivation}
 			</button>
 		</div>
 	</div>

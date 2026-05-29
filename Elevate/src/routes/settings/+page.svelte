@@ -1,6 +1,30 @@
 <script>
 	let language = 'de';
     import { goto } from '$app/navigation';
+	import {
+		getUser,
+		getUserId
+	} from '$lib/components/auth';
+	import { translations } from '$lib/i18n';
+	import { languageState } from '$lib/language.svelte.js';
+
+	let t = $derived(translations[languageState.language]);
+
+	function setLanguage(lang) {
+		languageState.setLanguage(lang);
+	}
+
+	let userId = $state(null);
+	let user = $state(null);
+
+	$effect(() => {
+
+		user = getUser();
+
+		userId = getUserId();
+
+
+	});
 
 	
 	function goToChat(){
@@ -19,9 +43,6 @@
 		goto('/login');
 	}
 
-	function setLanguage(lang) {
-		language = lang;
-	}
 
 	function logout() {
 		console.log('logout');
@@ -60,7 +81,7 @@
 					mobileMenu = false;
 				}}
 			>
-				Dashboard
+				{t.dashboard}
 			</button>
 
 			<button
@@ -69,7 +90,7 @@
 					mobileMenu = false;
 				}}
 			>
-				Chat
+				{t.chat}
 			</button>
 
 			<button
@@ -78,7 +99,7 @@
 					mobileMenu = false;
 				}}
 			>
-				Statistik
+				{t.statistics}
 			</button>
 
 			<button 
@@ -87,14 +108,14 @@
 					mobileMenu = false;
 				}}
 			>
-				Einstellungen
+				{t.settings}
 			</button>
 
 		</div>
 
 		<div class="nav-right">
 			<div onclick={goToSettings} class="settings">⚙</div>
-			<div class="chat-profile">A</div>
+			<div class="profile">{user?.username.charAt(0).toUpperCase() || 'U'}</div>
 		</div>
 
 	</nav>
@@ -107,23 +128,23 @@
 
 			<!-- Sprache -->
 			<div class="section">
-				<h2>Sprache</h2>
-				<p>wähle deine bevorzugte Sprache</p>
+				<h2>{t.language}</h2>
+				<p>{t.selectLanguage}</p>
 
 				<div class="language-buttons">
 
 					<button
-						class:active-language={language === 'de'}
+						class:active-language={languageState.language === 'de'}
 						onclick={() => setLanguage('de')}
 					>
-						Deutsch
+						{t.german}
 					</button>
 
 					<button
-						class:active-language={language === 'en'}
+						class:active-language={languageState.language === 'en'}
 						onclick={() => setLanguage('en')}
 					>
-						English
+						{t.english}
 					</button>
 
 				</div>
@@ -131,14 +152,13 @@
 
 			<!-- Account -->
 			<div class="section account-section">
-				<h2>Account</h2>
-				<p>verwalte deinen Account</p>
-
+				<h2>{t.account}</h2>
+				<p>{t.manageAccount}</p>
 				<button
 					class="logout-btn"
 					onclick={goToLogin}
 				>
-					Ausloggen
+					{t.logout}
 				</button>
 			</div>
 
@@ -148,13 +168,12 @@
 		<div class="profile-card">
 
 			<div class="big-circle">
-				A
+				{user?.username.charAt(0).toUpperCase() || 'U'}
 			</div>
 
-			<h3>Angelika</h3>
+			<h3>{user?.username}</h3>
 
-			<p>Premium Mitglied</p>
-
+			<p>{t.premium}</p>
 		</div>
 
 	</div>
@@ -251,6 +270,32 @@
 
 		margin-left: auto;
 	}
+
+	 .settings,
+    .profile {
+        width: 46px;
+        height: 46px;
+
+        border-radius: 16px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-weight: 700;
+
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .profile {
+        background: #c7d2fe;
+        color: #3730a3;
+    }
+
+    .profile:hover {
+        transform: scale(1.05);
+    }
 
 	.settings,
 	.chat-profile {

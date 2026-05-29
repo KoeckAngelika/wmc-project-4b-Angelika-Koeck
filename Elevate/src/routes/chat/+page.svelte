@@ -2,7 +2,23 @@
 
 	import { goto } from '$app/navigation';
     import { io } from 'socket.io-client';
-    import { getUserId } from '$lib/components/auth';
+    import {
+		getUser,
+		getUserId
+	} from '$lib/components/auth';
+
+
+	let userId = $state(null);
+	let user = $state(null);
+
+	$effect(() => {
+
+		user = getUser();
+
+		userId = getUserId();
+
+
+	});
 
     const socket = io('http://localhost:3000');
 
@@ -345,7 +361,7 @@
 
         <div class="nav-right">
             <div onclick={goToSettings} class="settings">⚙</div>
-            <div class="chat-profile">A</div>
+			<div class="profile">{user?.username.charAt(0).toUpperCase() || 'U'}</div>
         </div>
 
     </nav>
@@ -847,6 +863,32 @@
 
         flex: 1;
 
+    }
+
+    .settings,
+    .profile {
+        width: 46px;
+        height: 46px;
+
+        border-radius: 16px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-weight: 700;
+
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .profile {
+        background: #c7d2fe;
+        color: #3730a3;
+    }
+
+    .profile:hover {
+        transform: scale(1.05);
     }
 
     .add-user {
