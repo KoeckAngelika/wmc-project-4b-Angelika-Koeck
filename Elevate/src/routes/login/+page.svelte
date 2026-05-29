@@ -2,6 +2,10 @@
 	import { goto } from '$app/navigation';
 	import { saveUser  } from '$lib/components/auth';
 
+	import { translations } from '$lib/i18n';
+	import { languageState } from '$lib/language.svelte.js';
+
+	let t = $derived(translations[languageState.language]);
 
 	let username = $state('');
 	let password = $state('');
@@ -28,7 +32,7 @@
 		
 
 		if(!data){
-			alert("Falsche Anmeldedaten");
+			alert(t.invalidCredentials);
 		}else{
 			goto('/dashboard');
 		}
@@ -46,33 +50,35 @@
 
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label>Benutzername</label>
-            <input bind:value={username} type="text" placeholder="Username">
+            <label>{t.username}</label>
+            <input bind:value={username} type="text" placeholder={t.username}>
         </div>
 
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label>Passwort</label>
+            <label>{t.password}</label>
             <input bind:value={password} type="password" placeholder="*******">
 			
-            <p class="passwort-text">Mindestens 8 Zeichen, inklusive Zahlen und Sonderzeichen</p>
-        </div>
+			<p class="passwort-text">
+				{t.passwordHint}
+			</p>       
+		</div>
 
         <p class="forgot">
 			<a href="/passwort-ändern">
-            	Passwort vergessen?
+            	{t.forgotPassword}
 			</a>
         </p>
 
         <button onclick={goTodashboard}>
-            Anmelden
+            {t.login}
         </button>
 
 		<p class="register-text">
-			Noch kein Konto?
+			{t.noAccount}
 
 			<a href="/register">
-				Registrieren
+				{t.register}
 			</a>
 		</p>
 

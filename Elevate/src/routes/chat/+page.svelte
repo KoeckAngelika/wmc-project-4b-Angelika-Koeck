@@ -7,6 +7,11 @@
 		getUserId
 	} from '$lib/components/auth';
 
+    import { translations } from '$lib/i18n';
+    import { languageState } from '$lib/language.svelte.js';
+
+    let t = $derived(translations[languageState.language]);
+
 
 	let userId = $state(null);
 	let user = $state(null);
@@ -132,7 +137,7 @@
             const data = await response.json();
 
             messages = data.map(msg => ({
-                user: msg.sender_id == userId ? 'Du' : 'Freund',
+                user: msg.sender_id == userId ? t.you : t.friend,                
                 text: msg.message,
                 ai: msg.sender_id != userId
             }));
@@ -249,7 +254,7 @@
         }
 
         if(!selectedFriend) {
-            alert('Wähle einen Chat aus');
+            alert(t.selectChat);
             return;
         }
 
@@ -279,7 +284,7 @@
             messages = [
                 ...messages,
                 {
-                    user: 'Du',
+                    user: t.you,
                     text: newMessage,
                     ai: false
                 }
@@ -326,7 +331,7 @@
                     mobileMenu = false;
                 }}
             >
-                Dashboard
+                {t.dashboard}
             </button>
 
             <button
@@ -335,7 +340,7 @@
                     mobileMenu = false;
                 }}
             >
-                Chat
+                {t.chat}
             </button>
 
             <button
@@ -344,7 +349,7 @@
                     mobileMenu = false;
                 }}
             >
-                Statistik
+                {t.statistics}
             </button>
 
             <button
@@ -354,7 +359,7 @@
                     mobileMenu = false;
                 }}
             >
-                Einstellungen
+                {t.settings}
             </button>
 
         </div>
@@ -369,21 +374,21 @@
     <div class="content">
 
         <div class="sidebar">
-            <h2>Chats</h2>
+            <h2>{t.chats}</h2>
             <div class="chat-tabs">
 
                 <button
                     class:active-tab={tab === 'contacts'}
                     onclick={() => tab = 'contacts'}
                 >
-                    Kontakte
+                    {t.contacts}
                 </button>
 
                 <button
                     class:active-tab={tab === 'add'}
                     onclick={() => tab = 'add'}
                 >
-                    Adden
+                    {t.add}
                         {#if requests.length > 0}
                             (+{requests.length})
                         {/if}
@@ -401,10 +406,10 @@
                         💬
                     </div>
 
-                    <h3>Keine Kontakte</h3>
+                    <h3>{t.noContacts}</h3>
 
                     <p>
-                        Füge neue User hinzu um einen Chat zu starten
+                        {t.addUsersToStartChat}
                     </p>
 
                 </div>
@@ -435,7 +440,7 @@
 
                             <h3>{friend.username}</h3>
 
-                            <p>Kontakt</p>
+                            <p>{t.contact}</p>
 
                         </div>
 
@@ -451,7 +456,7 @@
 
                     <div class="request-section">
 
-                        <h4>Anfragen</h4>
+                        <h4>{t.requests}</h4>
 
                         {#each requests as request}
 
@@ -465,7 +470,7 @@
 
                                     <h3>{request.username}</h3>
 
-                                    <p>möchte dich adden</p>
+                                    <p>{t.wantsToAddYou}</p>
 
                                 </div>
 
@@ -491,7 +496,7 @@
                     <input
                         bind:value={search}
                         type="text"
-                        placeholder="User suchen..."
+                        placeholder={t.searchUsers}
                         oninput={searchUsers}
                     />
 
@@ -509,7 +514,7 @@
 
                             <h3>{user.username}</h3>
 
-                            <p>User gefunden</p>
+                            <p>{t.userFound}</p>
 
                         </div>
 
@@ -548,10 +553,10 @@
                         💬
                     </div>
 
-                    <h2>Kein Chat ausgewählt</h2>
+                    <h2>{t.noChatSelected}</h2>
 
                     <p>
-                        Wähle einen Kontakt oder füge neue Freunde hinzu
+                        {t.selectContact}                    
                     </p>
 
                 </div>
@@ -572,7 +577,7 @@
                 <input
                     bind:value={newMessage}
                     type="text"
-                    placeholder="Nachricht schreiben..."
+                    placeholder={t.writeMessage}                    
                     onkeydown={(e) => {
                         if(e.key === 'Enter') {
                             sendMessage();
@@ -581,7 +586,7 @@
                 />
 
                 <button onclick={sendMessage}>
-                    Senden
+                    {t.send}
                 </button>
             </div>
         </div>

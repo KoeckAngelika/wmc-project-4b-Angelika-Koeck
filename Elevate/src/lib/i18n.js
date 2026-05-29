@@ -146,7 +146,23 @@ export const translations = {
 
 		jogging: "Joggen",
 
-		times: "mal"
+		times: "mal",
+		selectChat: "Wähle einen Chat aus",
+
+		// Login
+		username: "Benutzername",
+		password: "Passwort",
+
+		login: "Anmelden",
+		register: "Registrieren",
+
+		forgotPassword: "Passwort vergessen?",
+
+		noAccount: "Noch kein Konto?",
+
+		invalidCredentials: "Falsche Anmeldedaten",
+
+		passwordHint: "Mindestens 8 Zeichen, inklusive Zahlen und Sonderzeichen",
 	},
 
 	en: {
@@ -297,6 +313,23 @@ export const translations = {
 
 		jogging: "Jogging",
 
-		times: "times"
+		times: "times",
+		// en
+		selectChat: "Select a chat",
+
+		// Login
+		username: "Username",
+		password: "Password",
+
+		login: "Login",
+		register: "Register",
+
+		forgotPassword: "Forgot password?",
+
+		noAccount: "Don't have an account yet?",
+
+		invalidCredentials: "Invalid login credentials",
+
+		passwordHint: "At least 8 characters, including numbers and special characters",
 	}
 };
