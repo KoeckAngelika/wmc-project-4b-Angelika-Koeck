@@ -20,6 +20,8 @@
 
 		userId = getUserId();
 
+		languageState.loadLanguage();
+
 		if(userId) {
 			loadTasks();
 		}
@@ -787,10 +789,6 @@
 		border: none;
 	}
 
-	.task span {
-		font-size: 16px;
-		color: #111827;
-	}
 
 	.progress-section {
 		margin-top: 50px;
@@ -846,16 +844,6 @@
 	.add {
 		background: #c7d2fe;
 		color: #3730a3;
-	}
-
-	.edit {
-		background: #bbf7d0;
-		color: #166534;
-	}
-
-	.delete {
-		background: #fecaca;
-		color: #991b1b;
 	}
 
 	.side-card {

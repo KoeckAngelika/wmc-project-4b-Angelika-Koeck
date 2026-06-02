@@ -163,6 +163,12 @@ export const translations = {
 		invalidCredentials: "Falsche Anmeldedaten",
 
 		passwordHint: "Mindestens 8 Zeichen, inklusive Zahlen und Sonderzeichen",
+
+		email: "E-Mail",
+		personalData: "Persönliche Daten",
+		age: "Geburtsdatum",
+		height: "Größe in cm",
+		weight: "Gewicht in kg",
 	},
 
 	en: {
@@ -331,5 +337,11 @@ export const translations = {
 		invalidCredentials: "Invalid login credentials",
 
 		passwordHint: "At least 8 characters, including numbers and special characters",
+
+		email: "E-Mail",
+		personalData: "Personal Data",
+		age: "Birthdate",
+		height: "Height in cm",
+		weight: "Weight in kg",
 	}
 };

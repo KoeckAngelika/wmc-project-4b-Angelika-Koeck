@@ -190,4 +190,31 @@ router.get("/friends/:id", (req, res) => {
 
 });
 
+router.patch('/language/:id', (req, res) => {
+
+	const { language } = req.body;
+	const { id } = req.params;
+
+	db.run(
+		`
+		UPDATE users
+		SET language = ?
+		WHERE id = ?
+		`,
+		[language, id],
+		function(error) {
+
+			if(error) {
+				return res.status(500).json(error);
+			}
+
+			res.json({
+				success: true
+			});
+
+		}
+	);
+
+});
+
 module.exports = router;

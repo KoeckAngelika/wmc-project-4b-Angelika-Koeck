@@ -3,15 +3,40 @@
     import { goto } from '$app/navigation';
 	import {
 		getUser,
-		getUserId
+		getUserId,
+		updateUserLanguage
 	} from '$lib/components/auth';
 	import { translations } from '$lib/i18n';
 	import { languageState } from '$lib/language.svelte.js';
 
 	let t = $derived(translations[languageState.language]);
 
-	function setLanguage(lang) {
+	async function setLanguage(lang) {
+
+	
 		languageState.setLanguage(lang);
+
+
+		// localStorage User ändern
+		updateUserLanguage(lang);
+
+
+		// Datenbank ändern
+		await fetch(
+			`http://localhost:3000/users/language/${userId}`,
+			{
+				method: "PATCH",
+
+				headers: {
+					"Content-Type": "application/json"
+				},
+
+				body: JSON.stringify({
+					language: lang
+				})
+			}
+		);
+
 	}
 
 	let userId = $state(null);
@@ -23,6 +48,7 @@
 
 		userId = getUserId();
 
+		languageState.loadLanguage();
 
 	});
 
@@ -325,46 +351,6 @@
 		background: #e5e7eb;
 	}
 
-	.chat-profile {
-		background: #c7d2fe;
-		color: #3730a3;
-	}
-
-	.chat-profile:hover {
-		transform: scale(1.05);
-	}
-
-	.profile-circle {
-		width: 44px;
-		height: 44px;
-
-		border-radius: 50%;
-
-		background: #c7d2fe;
-
-		display: flex;
-		align-items: center;
-		justify-content: center;
-
-		font-weight: 700;
-		color: #4338ca;
-	}
-
-	/* HEADER */
-
-	.header {
-		margin-top: 42px;
-	}
-
-	.header h1 {
-		font-size: 62px;
-		margin: 0;
-	}
-
-	.header p {
-		color: #6b7280;
-		margin-top: 12px;
-	}
 
 	/* CARD */
 
@@ -599,24 +585,7 @@
 			display: none;
 		}
 
-		.sidebar,
-		.chat-box {
-			width: 100%;
-			min-height: auto;
-		}
-
-		.content {
-			grid-template-columns: 1fr;
-		}
-
-		.input-area {
-			flex-direction: column;
-		}
-
-		.input-area input,
-		.input-area button {
-			width: 100%;
-		}
+		
 	}
 
 	@media (max-width: 950px) {

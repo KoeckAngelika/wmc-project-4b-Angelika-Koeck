@@ -18,12 +18,13 @@
 
 	$effect(() => {
 
-		user = getUser();
+        user = getUser();
 
-		userId = getUserId();
+        userId = getUserId();
 
+        languageState.loadLanguage();
 
-	});
+    });
 
     const socket = io('http://localhost:3000');
 
@@ -56,18 +57,12 @@
 
     $effect(() => {
 
-        socket.on('receive_message', (message) => {
+        if(userId){
 
-            messages = [...messages, message];
+            loadRequests();
+            loadFriends();
 
-        });
-
-    });
-
-    $effect(() => {
-
-        loadRequests();
-	    loadFriends();
+        }
 
         socket.on('receive_message', (message) => {
 
@@ -1002,14 +997,6 @@
         background: #e5e7eb;
     }
 
-    .chat-profile {
-        background: #c7d2fe;
-        color: #3730a3;
-    }
-
-    .chat-profile:hover {
-        transform: scale(1.05);
-    }
 
 
     .content {
@@ -1102,21 +1089,7 @@
         color: #3730a3;
     }
 
-    .big-avatar {
-        width: 60px;
-        height: 60px;
-
-        border-radius: 20px;
-
-        background: #c7d2fe;
-        color: #3730a3;
-        font-size: 18px;
-    }
-
-    .gray {
-        background: #e5e7eb;
-        color: #374151;
-    }
+    
 
     /* CHAT */
 
@@ -1135,30 +1108,7 @@
         box-shadow: 0 12px 30px rgba(0,0,0,0.04);
     }
 
-    .chat-header {
-        padding: 28px 34px;
-
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .chat-user {
-        display: flex;
-        align-items: center;
-        gap: 18px;
-    }
-
-    .chat-user h3 {
-        margin: 0;
-        font-size: 20px;
-        color: #111827;
-    }
-
-    .chat-user p {
-        margin: 5px 0 0;
-        font-size: 14px;
-        color: #6b7280;
-    }
-
+    
     .messages {
         flex: 1;
 

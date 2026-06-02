@@ -7,6 +7,16 @@
 
 	let t = $derived(translations[languageState.language]);
 
+	let loginLanguage = $state(languageState.language);
+
+	function changeLanguage(lang){
+
+		languageState.setLanguage(lang);
+
+		loginLanguage = lang;
+
+	}
+
 	let username = $state('');
 	let password = $state('');
 
@@ -47,6 +57,25 @@
 			alt="Elevate Logo"
 			class="logo"
 		/>
+
+		<div class="language-buttons">
+
+			<button
+				class:active-language={loginLanguage === 'de'}
+				onclick={() => changeLanguage('de')}
+			>
+				DE
+			</button>
+
+
+			<button
+				class:active-language={loginLanguage === 'en'}
+				onclick={() => changeLanguage('en')}
+			>
+				EN
+			</button>
+
+		</div>
 
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
@@ -107,6 +136,84 @@
 		padding: 20px;
 		box-sizing: border-box;
 	}
+
+	.language-buttons {
+
+	display: flex;
+	justify-content: center;
+
+	gap: 12px;
+
+	margin-bottom: 25px;
+
+}
+
+
+.language-buttons {
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	gap: 6px;
+
+	width: fit-content;
+
+	margin: -5px auto 30px auto;
+
+	padding: 6px;
+
+	background: #f3f4f6;
+
+	border-radius: 18px;
+
+}
+	
+
+.language-buttons button {
+
+	width: 72px;
+	height: 42px;
+
+	border: none;
+
+	border-radius: 14px;
+
+	background: transparent;
+
+	color: #6b7280;
+
+	font-size: 14px;
+	font-weight: 700;
+
+	cursor: pointer;
+
+	transition: 0.25s;
+
+}
+
+
+.language-buttons button:hover {
+
+	background: #eef2ff;
+
+	color: #4f46e5;
+
+}
+
+
+.active-language {
+
+	background: #c7d2fe !important;
+
+	color: #3730a3 !important;
+
+	box-shadow:
+		0 6px 14px rgba(99,102,241,0.18);
+
+}
+
+
 
 	.card {
 		width: 100%;

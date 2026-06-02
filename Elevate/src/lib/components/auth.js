@@ -7,6 +7,7 @@ export function saveUser(user) {
 
 }
 
+
 export function getUser() {
 
 	const user = localStorage.getItem('user');
@@ -19,6 +20,7 @@ export function getUser() {
 
 }
 
+
 export function getUserId() {
 
 	const user = getUser();
@@ -26,6 +28,36 @@ export function getUserId() {
 	return user?.id;
 
 }
+
+
+export function getUserLanguage() {
+
+	const user = getUser();
+
+	return user?.language || 'de';
+
+}
+
+
+export function updateUserLanguage(language) {
+
+	const user = getUser();
+
+	if(!user) {
+		return;
+	}
+
+
+	user.language = language;
+
+
+	localStorage.setItem(
+		'user',
+		JSON.stringify(user)
+	);
+
+}
+
 
 export function logout() {
 

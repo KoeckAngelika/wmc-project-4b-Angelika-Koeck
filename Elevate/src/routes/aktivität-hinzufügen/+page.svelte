@@ -11,10 +11,20 @@
 	import { translations } from '$lib/i18n';
 	import { languageState } from '$lib/language.svelte.js';
 
-let t = $derived(translations[languageState.language]);
+	let t = $derived(translations[languageState.language]);
 
 	let userId = $state(null);
 	let user = $state(null);
+
+	$effect(() => {
+
+		user = getUser();
+
+		userId = getUserId();
+
+		languageState.loadLanguage();
+
+	});
 
 	function gotToDashboard(){
 		goto('/dashboard');
@@ -25,7 +35,7 @@ let t = $derived(translations[languageState.language]);
 	let duration = $state('');
 	let repeat = $state('');
 
-	let unit = 'Minuten';
+	let unit = $derived(t.minutes);
 
 	const taskId = $derived.by(() => {
 
@@ -85,15 +95,19 @@ let t = $derived(translations[languageState.language]);
 		const value = Number(duration || 0);
 
 		let timeText = `${value} ${t.minutes}`;
-		if(unit === 'Minuten' && value >= 60) {
+
+
+		if(value >= 60) {
 
 			const hours = (value / 60).toFixed(1);
 
-			timeText = `${hours} ${t.hours}`;;
+			timeText = `${hours} ${t.hours}`;
 
 		}
 
+
 		return `${timeText} ${activity || t.jogging} · ${repeat || `10 ${t.times}`}`;
+
 	});
 	
 

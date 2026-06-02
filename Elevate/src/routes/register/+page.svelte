@@ -2,6 +2,22 @@
 
 	import { goto } from '$app/navigation';
 
+	import { translations } from '$lib/i18n';
+	import { languageState } from '$lib/language.svelte.js';
+
+	let t = $derived(translations[languageState.language]);
+
+
+	let registerLanguage = $state(languageState.language);
+
+	function changeLanguage(lang){
+
+		languageState.setLanguage(lang);
+
+		registerLanguage = lang;
+
+	}
+
 	let email = $state('');
 	let username = $state('');
 	let password = $state('');
@@ -60,37 +76,58 @@
 			class="logo"
 		/>
 
+		<div class="language-buttons">
+
+			<button
+				class:active-language={registerLanguage === 'de'}
+				onclick={() => changeLanguage('de')}
+			>
+				Deutsch
+			</button>
+
+
+			<button
+				class:active-language={registerLanguage === 'en'}
+				onclick={() => changeLanguage('en')}
+			>
+				English
+			</button>
+
+		</div>
+
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label>E-Mail</label>
+            <label>{t.email}</label>
             <input bind:value={email} type="text" placeholder="test@user">
         </div>
 
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label>E-Benutzername</label>
+            <label>{t.username}</label>
             <input bind:value={username} type="text" placeholder="User1234">
         </div>
 
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label>Passwort</label>
+            <label>{t.password}</label>
             <input bind:value={password} type="password" placeholder="*******">
-            <p class="passwort-text">Mindestens 8 Zeichen, inklusive Zahlen und Sonderzeichen</p>
+            <p class="passwort-text">
+				{t.passwordHint}
+			</p>
         </div>
 
         <div class="input-group">
             <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label>Persöhnliche Daten</label>
+            <label>{t.personalData}</label>
             <div class="personal-data">
-                <input bind:value={birthdate} type="date" placeholder="Alter" />
-                <input bind:value={size} min="30" max="300" type="number" placeholder="Größe in cm" />
-                <input bind:value={weight} min="10" type="number" placeholder="Gewicht in kg" />
+                <input bind:value={birthdate} type="date" placeholder={t.age} />
+                <input bind:value={size} min="30" max="300" type="number" placeholder={t.height} />
+                <input bind:value={weight} min="10" type="number" placeholder={t.weight} />
             </div>
         </div>
 
         <button onclick={goToLogin}>
-            Registrieren
+            {t.register}
         </button>
 
     </div>
@@ -117,6 +154,58 @@
 
 		padding: 20px;
 		box-sizing: border-box;
+	}
+
+	.language-buttons {
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		gap: 6px;
+
+		width: fit-content;
+
+		margin: -5px auto 30px auto;
+
+		padding: 6px;
+
+		background: #f3f4f6;
+
+		border-radius: 18px;
+
+	}
+
+
+	.language-buttons button {
+
+		width: 90px;
+		height: 42px;
+
+		border: none;
+
+		border-radius: 14px;
+
+		background: transparent;
+
+		color: #6b7280;
+
+		font-size: 14px;
+		font-weight: 700;
+
+		cursor: pointer;
+
+		transition: 0.25s;
+
+	}
+
+
+	.active-language {
+
+		background: #c7d2fe !important;
+
+		color: #3730a3 !important;
+
 	}
 
 	.card {

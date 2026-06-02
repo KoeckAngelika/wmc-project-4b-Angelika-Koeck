@@ -6,17 +6,32 @@
 		getUserId
 	} from '$lib/components/auth';
 
+    import { translations } from '$lib/i18n';
+    import { languageState } from '$lib/language.svelte.js';
+
+    let t = $derived(translations[languageState.language]);
+
     
 	let userId = $state(null);
 	let user = $state(null);
 
 	$effect(() => {
 
-		user = getUser();
+        user = getUser();
 
-		userId = getUserId();
+        userId = getUserId();
 
-	});
+        languageState.loadLanguage();
+
+    });
+
+    $effect(() => {
+
+        if(userId && t){
+            loadStats();
+        }
+
+    });
 
 	function goToDashboard(){
 		goto('/dashboard');
@@ -55,14 +70,14 @@
 
                     {
                         id: "steps",
-                        title: "Schritte",
+                        title: t.steps,
                         short: "S",
                         color: "#4f46e5",
                         value: latest.steps,
                         percent: "+12%",
-                        days: `${latest.steps} Schritte`,
-                        active: "Heute aktiv",
-                        extra: "Workout"
+                        days: `${latest.steps} ${t.steps}`,
+                        active: t.todayActive,
+                        extra: t.workout
                     },
 
                     {
@@ -79,14 +94,14 @@
 
                     {
                         id: "weight",
-                        title: "Gewicht",
+                        title: t.weight,
                         short: "G",
                         color: "#ef4444",
                         value: latest.weight_kg || 0,
                         percent: "0%",
                         days: `${latest.weight_kg || 0} kg`,
-                        active: "Aktuelles Gewicht",
-                        extra: "Stabil"
+                        active: t.currentWeight,
+                        extra: t.stable
                     }
 
                 ];
@@ -101,7 +116,6 @@
 
     }
 
-    loadStats();
 
 </script>
 
@@ -134,7 +148,7 @@
                     mobileMenu = false;
                 }}
             >
-                Dashboard
+                {t.dashboard}
             </button>
 
             <button
@@ -143,7 +157,7 @@
                     mobileMenu = false;
                 }}
             >
-                Chat
+                {t.chat}
             </button>
 
             <button
@@ -152,7 +166,7 @@
                     mobileMenu = false;
                 }}
             >
-                Statistik
+                {t.statistics}
             </button>
 
             <button
@@ -162,7 +176,7 @@
                     mobileMenu = false;
                 }}
             >
-                Einstellungen
+                {t.settings}
             </button>
 
         </div>
@@ -176,7 +190,7 @@
 
         <div class="sidebar">
 
-            <h2>Kategorien</h2>
+            <h2>{t.categories}</h2>
 
             {#each stats as stat}
 
@@ -209,7 +223,7 @@
             <div class="stats-header">
                 <div>
                     <h2>{selectedStat?.title}</h2>                   
-                    <p>deine letzten 10 Tage</p>
+                    <p>{t.last10Days}</p>
                 </div>
             </div>
 
@@ -380,17 +394,6 @@
         margin-left: auto;
     }
 
-    
-    .passwort-text{
-        margin-top: 16px;
-
-		text-align: left;
-
-		font-size: 14px;
-
-		color: #6b7280;
-    }
-
  .settings,
     .profile {
         width: 46px;
@@ -441,16 +444,6 @@
     .settings:hover {
         background: #e5e7eb;
     }
-
-    .chat-profile {
-        background: #c7d2fe;
-        color: #3730a3;
-    }
-
-    .chat-profile:hover {
-        transform: scale(1.05);
-    }
-
 
     .content {
         margin-top: 35px;
@@ -504,9 +497,6 @@
         transform: translateY(-2px);
     }
 
-    .active-chat {
-        background: #eef2ff;
-    }
 
     .chat-item h3 {
         margin: 0;
@@ -532,10 +522,6 @@
         color: #3730a3;
     }
 
-    .gray {
-        background: #e5e7eb;
-        color: #374151;
-    }
 
 
     @media (max-width: 1100px) {
