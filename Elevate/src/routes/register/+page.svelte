@@ -6,6 +6,7 @@
 	import { languageState } from '$lib/language.svelte.js';
 
 	let t = $derived(translations[languageState.language]);
+	let errorMessage = $state('');
 
 
 	let registerLanguage = $state(languageState.language);
@@ -27,41 +28,82 @@
 
 	async function goToLogin(){
 
-		if(email != '' || username != '' || password != '' || birthdate != '' || size != 0 || weight != 0){
+		if(
+			email == '' ||
+			username == '' ||
+			password == '' ||
+			birthdate == '' ||
+			size == '' ||
+			weight == ''
+		){
 
-			const parsedHeight = parseInt(size);
-			const parsedWeight = parseFloat(weight);
-			const response = await fetch(
-				"http://localhost:3000/auth/register",
-				{
-					method: "POST",
+			showError(t.invalidFields);			
+			return;
 
-					headers: {
-						"Content-Type": "application/json"
-					},
-
-					body: JSON.stringify({
-						email,
-						username,
-						password,
-						birthdate,
-						height_cm: parsedHeight,
-    					weight_kg: parsedWeight
-					})
-				}
-    		);
-
-    		const data = await response.json();
-
-			if (data.message === "Benutzername existiert bereits") {
-
-				alert("Benutzername bereits vergeben");
-
-				return;
-			}
-
-			goto('/login');
 		}
+
+
+		const passwordCheck = /^(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
+
+
+		if(!passwordCheck.test(password)){
+
+			showError(t.invalidPassword);			
+			return;
+
+		}
+
+
+		const parsedHeight = parseInt(size);
+		const parsedWeight = parseFloat(weight);
+
+
+		const response = await fetch(
+			"http://localhost:3000/auth/register",
+			{
+				method: "POST",
+
+				headers: {
+					"Content-Type": "application/json"
+				},
+
+				body: JSON.stringify({
+					email,
+					username,
+					password,
+					birthdate,
+					height_cm: parsedHeight,
+					weight_kg: parsedWeight
+				})
+			}
+		);
+
+
+		const data = await response.json();
+
+
+		if(data.message === "Benutzername existiert bereits"){
+
+			showError(t.usernameTaken);			
+			return;
+
+		}
+
+
+		goto('/login');
+
+	}
+
+	function showError(message){
+
+		errorMessage = message;
+
+
+		setTimeout(() => {
+
+			errorMessage = '';
+
+		},3000);
 
 	}
 	
@@ -131,6 +173,13 @@
         </button>
 
     </div>
+	{#if errorMessage}
+
+		<div class="error-toast">
+			{errorMessage}
+		</div>
+
+	{/if}
 </div>
 
 <style>
@@ -155,6 +204,48 @@
 		padding: 20px;
 		box-sizing: border-box;
 	}
+	
+	.error-toast {
+
+		position: fixed;
+
+		right: 30px;
+		bottom: 30px;
+
+		background: #fee2e2;
+
+		color: #991b1b;
+
+		padding: 16px 22px;
+
+		border-radius: 16px;
+
+		font-size: 15px;
+		font-weight: 600;
+
+		box-shadow:
+			0 10px 25px rgba(0,0,0,0.15);
+
+		animation: slideIn 0.3s ease;
+
+		z-index: 100;
+
+	}
+
+
+	@keyframes slideIn {
+
+		from {
+			transform: translateX(120%);
+			opacity: 0;
+		}
+
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
+
+	}
 
 	.language-buttons {
 
@@ -175,6 +266,7 @@
 		border-radius: 18px;
 
 	}
+
 
 
 	.language-buttons button {

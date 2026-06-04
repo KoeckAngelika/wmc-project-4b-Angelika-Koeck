@@ -49,70 +49,146 @@
 
     let stats = $state([]);
     let selectedStat = $state(null);
+    let graphPoints = $state('');
+    let hoverPoint = $state(null);
 
     async function loadStats(){
 
-        try{
+            try{
 
-            const userId = getUserId();
+                const userId = getUserId();
 
-            const res = await fetch(
-                `http://localhost:3000/statistics/${userId}`
-            );
+                const res = await fetch(
+                    `http://localhost:3000/statistics/${userId}`
+                );
 
-            const data = await res.json();
+                const data = await res.json();
 
-            if(data.length > 0){
+                console.log("ALLE STATISTIK DATEN:");
+                console.log(data);
 
-                const latest = data[data.length - 1];
 
-                stats = [
+                if(data.length > 0){
 
-                    {
-                        id: "steps",
-                        title: t.steps,
-                        short: "S",
-                        color: "#4f46e5",
-                        value: latest.steps,
-                        percent: "+12%",
-                        days: `${latest.steps} ${t.steps}`,
-                        active: t.todayActive,
-                        extra: t.workout
-                    },
+                    const latest = data[data.length - 1];
+                    const last10Days = data.slice(-10);
 
-                    {
-                        id: "calories",
-                        title: "Kalorien",
-                        short: "K",
-                        color: "#22c55e",
-                        value: latest.calories_burned,
-                        percent: "+8%",
-                        days: `${latest.calories_burned} kcal`,
-                        active: "Verbrannt",
-                        extra: "Sehr gut"
-                    },
+                    const activeDays = last10Days.filter(x => x.steps > 0).length;
 
-                    {
-                        id: "weight",
-                        title: t.weight,
-                        short: "G",
-                        color: "#ef4444",
-                        value: latest.weight_kg || 0,
-                        percent: "0%",
-                        days: `${latest.weight_kg || 0} kg`,
-                        active: t.currentWeight,
-                        extra: t.stable
-                    }
+                    const inactiveDays = 10 - activeDays;
 
-                ];
 
-                selectedStat = stats[0];
+                    stats = [
+
+                        {
+                            id: "steps",
+                            title: t.steps,
+                            short: "S",
+                            color: "#4f46e5",
+
+                            value: latest.steps,
+
+                            graphValues: last10Days.map(x => ({
+                                value: x.steps,
+                                date: x.stat_date
+                            })),
+                            days: `${last10Days.length}/10 Tage`,
+                            active: `${activeDays} aktiv`,
+                            extra: `${inactiveDays} nicht aktiv`
+                        
+                        },
+
+
+                        {
+                            id: "calories",
+                            title: "Kalorien",
+                            short: "K",
+                            color: "#22c55e",
+
+                            value: latest.calories_burned,
+
+                            graphValues: last10Days.map(x => ({
+                                value: x.calories_burned,
+                                date: x.stat_date
+                            })),
+                            days: `${last10Days.length}/10 Tage`,
+                            active: `${activeDays} aktiv`,
+                            extra: `${inactiveDays} nicht aktiv`
+                        
+                        },
+
+
+                        {
+                            id: "weight",
+                            title: t.weight,
+                            short: "G",
+                            color: "#ef4444",
+
+                            value: latest.weight_kg,
+
+                            graphValues: last10Days.map(x => ({
+                                value: x.weight_kg,
+                                date: x.stat_date
+                            })),
+
+                            days: `${last10Days.length}/10 Tage`,
+                            active: `${activeDays} aktiv`,
+                            extra: `${inactiveDays} nicht aktiv`
+                        }
+
+                    ];
+
+
+                    selectedStat = stats[0];
+
+                }
+
+            }catch(err){
+
+                console.log(err);
 
             }
 
-        }catch(err){
-            console.log(err);
+    }
+
+    function createGraph(values){
+
+        if(!values){
+            return [];
         }
+
+
+        let max = 10000;
+
+
+        if(selectedStat?.id === "steps"){
+            max = 20000;
+        }
+
+        if(selectedStat?.id === "calories"){
+            max = 2000;
+        }
+
+        if(selectedStat?.id === "weight"){
+            max = 200;
+        }
+
+
+        return values.map((item,index) => {
+
+            return {
+
+                x: 60 + index * 80,
+
+                y: 260 - (item.value / max) * 220,
+
+                value: item.value,
+
+                date: item.date
+
+            };
+
+        });
 
     }
 
@@ -237,18 +313,76 @@
 
                     <svg viewBox="0 0 900 320" class="chart">
 
-                        <path
-                            d="M60 240 L300 150 L520 90 L820 20"
+
+                        <polyline
+                            points={createGraph(selectedStat?.graphValues)
+                                .map(p => `${p.x},${p.y}`)
+                                .join(" ")}
                             fill="none"
                             stroke={selectedStat?.color}
                             stroke-width="8"
                             stroke-linecap="round"
                         />
 
-                        <circle cx="60" cy="240" r="10" fill={selectedStat?.color}/>
-                        <circle cx="300" cy="150" r="10" fill={selectedStat?.color}/>
-                        <circle cx="520" cy="90" r="10" fill={selectedStat?.color}/>
-                        <circle cx="820" cy="20" r="10" fill={selectedStat?.color}/>
+
+                        {#each createGraph(selectedStat?.graphValues) as point}
+
+                            <circle
+                                cx={point.x}
+                                cy={point.y}
+                                r="10"
+                                fill={selectedStat?.color}
+
+                                onmouseenter={() => hoverPoint = point}
+                                onmouseleave={() => hoverPoint = null}
+
+                                style="cursor:pointer"
+                            />
+
+                        {/each}
+
+
+                        {#if hoverPoint}
+
+                            <g>
+
+                                <rect
+                                    x={hoverPoint.x - 80}
+                                    y={hoverPoint.y - 80}
+                                    width="160"
+                                    height="60"
+                                    rx="14"
+                                    fill="white"
+                                />
+
+
+                                <text
+                                    x={hoverPoint.x}
+                                    y={hoverPoint.y - 55}
+                                    text-anchor="middle"
+                                    font-size="14"
+                                    fill="#6b7280"
+                                >
+                                    {hoverPoint.date}
+                                </text>
+
+
+                                <text
+                                    x={hoverPoint.x}
+                                    y={hoverPoint.y - 32}
+                                    text-anchor="middle"
+                                    font-size="18"
+                                    font-weight="700"
+                                    fill="#111827"
+                                >
+                                    {hoverPoint.value}
+                                </text>
+
+
+                            </g>
+
+                        {/if}
+
 
                     </svg>
 

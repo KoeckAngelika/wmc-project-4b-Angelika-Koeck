@@ -169,6 +169,11 @@ export const translations = {
 		age: "Geburtsdatum",
 		height: "Größe in cm",
 		weight: "Gewicht in kg",
+
+		invalidFields: "Bitte alle Felder ausfüllen",
+		invalidPassword: "Passwort braucht min. 8 Zeichen, eine Zahl und ein Sonderzeichen",
+		usernameTaken: "Benutzername bereits vergeben",
+		invalidLogin: "Benutzername oder Passwort falsch"
 	},
 
 	en: {
@@ -343,5 +348,10 @@ export const translations = {
 		age: "Birthdate",
 		height: "Height in cm",
 		weight: "Weight in kg",
+
+		invalidFields: "Please fill in all fields",
+		invalidPassword: "Password needs at least 8 characters, one number and one special character",
+		usernameTaken: "Username already exists",
+		invalidLogin: "Username or password is incorrect"
 	}
 };

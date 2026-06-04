@@ -8,6 +8,7 @@
 	let t = $derived(translations[languageState.language]);
 
 	let loginLanguage = $state(languageState.language);
+	let errorMessage = $state('');
 
 	function changeLanguage(lang){
 
@@ -21,6 +22,7 @@
 	let password = $state('');
 
 	async function goTodashboard(){
+
 		const response = await fetch(
 			"http://localhost:3000/auth/login", 
 			{
@@ -31,21 +33,44 @@
 					password: password
 				})
 			}
-		)
+		);
 
 		const data = await response.json();
+
+
+		if(!response.ok || !data.userId){
+
+			showError(t.invalidLogin);
+
+			username = '';
+			password = '';
+
+			return;
+
+		}
+
 
 		saveUser({
 			id: data.userId,
 			username: data.username
 		});
-		
 
-		if(!data){
-			alert(t.invalidCredentials);
-		}else{
-			goto('/dashboard');
-		}
+
+		goto('/dashboard');
+
+	}
+
+	function showError(message){
+
+		errorMessage = message;
+
+
+		setTimeout(() => {
+
+			errorMessage = '';
+
+		},3000);
+
 	}
 </script>
 
@@ -112,6 +137,11 @@
 		</p>
 
     </div>
+	{#if errorMessage}
+		<div class="error-toast">
+			{errorMessage}
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -139,14 +169,60 @@
 
 	.language-buttons {
 
-	display: flex;
-	justify-content: center;
+		display: flex;
+		justify-content: center;
 
-	gap: 12px;
+		gap: 12px;
 
-	margin-bottom: 25px;
+		margin-bottom: 25px;
 
-}
+	}
+
+	.error-toast {
+
+		position: fixed;
+
+		right: 30px;
+		bottom: 30px;
+
+		background: #fee2e2;
+
+		color: #991b1b;
+
+		padding: 16px 22px;
+
+		border-radius: 16px;
+
+		font-size: 15px;
+		font-weight: 600;
+
+		box-shadow:
+			0 10px 25px rgba(0,0,0,0.15);
+
+		animation: slideIn 0.3s ease;
+
+		z-index: 100;
+
+	}
+
+
+	@keyframes slideIn {
+
+		from {
+
+			transform: translateX(120%);
+			opacity: 0;
+
+		}
+
+		to {
+
+			transform: translateX(0);
+			opacity: 1;
+
+		}
+
+	}
 
 
 .language-buttons {
