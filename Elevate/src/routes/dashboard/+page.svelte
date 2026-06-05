@@ -4,6 +4,7 @@
 		getUser,
 		getUserId
 	} from '$lib/components/auth';
+	import { page } from '$app/state';
 
 	import { translations } from '$lib/i18n';
 	import { languageState } from '$lib/language.svelte.js';
@@ -51,7 +52,6 @@
 		);
 
 	}
-
 	function editTask(id) {
 
 		goto(`/aktivität-hinzufügen?id=${id}`);
@@ -61,7 +61,11 @@
 	
 	let tasks = $state([]);
 
-	let selectedDate = $state(new Date());
+	let selectedDate = $state(
+		page.url.searchParams.get('date')
+			? new Date(page.url.searchParams.get('date'))
+			: new Date()
+	);
 	let mobileMenu = $state(false);
 
 	let progress = $derived.by(() => {

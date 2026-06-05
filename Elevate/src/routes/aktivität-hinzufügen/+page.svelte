@@ -27,7 +27,7 @@
 	});
 
 	function gotToDashboard(){
-		goto('/dashboard');
+		goto(`/dashboard?date=${selectedDate}`);
 	}
 
 
@@ -180,7 +180,7 @@
 
 			console.log(data);
 
-			goto('/dashboard');
+			goto(`/dashboard?date=${selectedDate}`);
 
 		} catch(error) {
 
@@ -195,6 +195,8 @@
 		activity = '';
 		duration = '';
 		repeat = '';
+
+		goto('/dashboard');
 
 	}
 

@@ -11,7 +11,7 @@
     import { languageState } from '$lib/language.svelte.js';
 
     let t = $derived(translations[languageState.language]);
-
+    let sentRequests = $state([]);
 
 	let userId = $state(null);
 	let user = $state(null);
@@ -173,9 +173,6 @@
 
             const senderId = getUserId();
 
-            console.log('sender', senderId);
-            console.log('receiver', receiverId);
-
             const response = await fetch(
                 'http://localhost:3000/users/request',
                 {
@@ -195,6 +192,17 @@
             const data = await response.json();
 
             console.log(data);
+
+
+            // Button direkt von + auf ✓ ändern
+            if(response.ok) {
+
+                sentRequests = [
+                    ...sentRequests,
+                    receiverId
+                ];
+
+            }
 
         } catch(error) {
 
@@ -513,8 +521,7 @@
 
                         </div>
 
-                        {#if user.is_friend || user.requested}
-
+                        {#if user.is_friend || user.requested || sentRequests.includes(user.id)}
                             <div class="added-user">
                                 ✓
                             </div>
