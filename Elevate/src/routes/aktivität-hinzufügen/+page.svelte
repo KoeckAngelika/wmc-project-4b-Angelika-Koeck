@@ -34,6 +34,8 @@
 	let activity = $state('');
 	let duration = $state('');
 	let repeat = $state('');
+	let steps = $state('');
+	let calories = $state('');
 
 	let unit = $derived(t.minutes);
 
@@ -66,11 +68,15 @@
 
 			const data = await response.json();
 
+			console.log("GELADENE TASK DATEN:");
 			console.log(data);
 
 			activity = data.title;
 			duration = data.duration_min;
 			repeat = data.description;
+
+			steps = data.steps;
+			calories = data.calories_burned;
 
 		} catch(error) {
 
@@ -136,7 +142,9 @@
 						repeat,
 						unit,
 						date: selectedDate,
-						user_id: userId
+						user_id: userId,
+						steps,
+						calories
 					})
 				}
 			);
@@ -171,7 +179,9 @@
 					body: JSON.stringify({
 						name: activity,
 						duration,
-						repeat
+						repeat,
+						steps,
+						calories
 					})
 				}
 			);
@@ -195,6 +205,8 @@
 		activity = '';
 		duration = '';
 		repeat = '';
+		steps = '';
+		calories = '';
 
 		goto('/dashboard');
 
@@ -220,7 +232,7 @@
 			<input
 				bind:value={activity}
 				type="text"
-				placeholder={t.exampleJogging}
+				placeholder="Laufen"
 			/>
 
 		</div>
@@ -258,6 +270,33 @@
 				bind:value={repeat}
 				type="text"
 				placeholder={t.exampleRepeat}
+			/>
+
+		</div>
+
+		<!-- Schritte -->
+		<div class="input-group">
+
+			<label>Schritte</label>
+
+			<input
+				bind:value={steps}
+				type="number"
+				placeholder="5000"
+			/>
+
+		</div>
+
+
+		<!-- Kalorien -->
+		<div class="input-group">
+
+			<label>Kalorien</label>
+
+			<input
+				bind:value={calories}
+				type="number"
+				placeholder="300"
 			/>
 
 		</div>

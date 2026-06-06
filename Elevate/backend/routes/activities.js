@@ -3,6 +3,30 @@ const router = express.Router();
 
 const db = require("../db");
 
+
+
+router.get("/single/:id", (req, res) => {
+
+	const id = req.params.id;
+
+	const sql = `
+		SELECT *
+		FROM activities
+		WHERE id = ?
+	`;
+
+	db.get(sql, [id], (err, row) => {
+
+		if(err) {
+			return res.status(500).json(err);
+		}
+
+		res.json(row);
+
+	});
+
+});
+
 router.get("/:userId/:date", (req, res) => {
 
 	const userId = req.params.userId;
@@ -15,7 +39,9 @@ router.get("/:userId/:date", (req, res) => {
 			description,
 			activity_date,
 			duration_min,
-			completed
+			completed,
+			steps,
+			calories_burned
 		FROM activities
 		WHERE
 			user_id = ?
@@ -42,7 +68,9 @@ router.post("/", (req, res) => {
 		duration,
 		repeat,
 		date,
-		user_id
+		user_id,
+		steps,
+		calories
 	} = req.body;
 
 	const sql = `
@@ -53,9 +81,11 @@ router.post("/", (req, res) => {
 			description,
 			activity_date,
 			duration_min,
+			steps,
+			calories_burned,
 			completed
 		)
-		VALUES (?, ?, ?, ?, ?, ?, ?)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`;
 
 	db.run(
@@ -67,6 +97,8 @@ router.post("/", (req, res) => {
 			repeat,
 			date,
 			duration,
+			steps,
+			calories,
 			0
 		],
 		function(err) {
@@ -147,8 +179,8 @@ router.patch("/:id/toggle", (req, res) => {
 							[
 								activity.user_id,
 								today,
-								4000,
-								300
+								activity.steps,
+								activity.calories_burned
 							],
 							(err) => {
 
@@ -196,49 +228,6 @@ router.delete("/:id", (req, res) => {
 
 });
 
-router.get("/single/:id", (req, res) => {
-
-	const id = req.params.id;
-
-	const sql = `
-		SELECT *
-		FROM activities
-		WHERE id = ?
-	`;
-
-	db.get(sql, [id], (err, row) => {
-
-		if(err) {
-			return res.status(500).json(err);
-		}
-
-		res.json(row);
-
-	});
-
-});
-
-router.get("/single/:id", (req, res) => {
-
-	const id = req.params.id;
-
-	const sql = `
-		SELECT *
-		FROM activities
-		WHERE id = ?
-	`;
-
-	db.get(sql, [id], (err, row) => {
-
-		if(err) {
-			return res.status(500).json(err);
-		}
-
-		res.json(row);
-
-	});
-
-});
 
 router.put("/:id", (req, res) => {
 
@@ -247,7 +236,9 @@ router.put("/:id", (req, res) => {
 	const {
 		name,
 		duration,
-		repeat
+		repeat,
+		steps,
+		calories
 	} = req.body;
 
 	const sql = `
@@ -255,7 +246,9 @@ router.put("/:id", (req, res) => {
 		SET
 			title = ?,
 			description = ?,
-			duration_min = ?
+			duration_min = ?,
+			steps = ?,
+			calories_burned = ?
 		WHERE id = ?
 	`;
 
@@ -265,6 +258,8 @@ router.put("/:id", (req, res) => {
 			name,
 			repeat,
 			duration,
+			steps || 0,
+			calories || 0,
 			id
 		],
 		function(err) {

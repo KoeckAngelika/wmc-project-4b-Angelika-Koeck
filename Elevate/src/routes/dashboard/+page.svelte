@@ -54,7 +54,9 @@
 	}
 	function editTask(id) {
 
-		goto(`/aktivität-hinzufügen?id=${id}`);
+		goto(
+			`/aktivität-hinzufügen?id=${id}&date=${formatDate(selectedDate)}`
+		);
 
 	}
 

@@ -54,100 +54,99 @@
 
     async function loadStats(){
 
-            try{
+        try{
 
-                const userId = getUserId();
+            const userId = getUserId();
 
-                const res = await fetch(
-                    `http://localhost:3000/statistics/${userId}`
-                );
+            const res = await fetch(
+                `http://localhost:3000/statistics/${userId}`
+            );
 
-                const data = await res.json();
+            const data = await res.json();
 
-                console.log("ALLE STATISTIK DATEN:");
-                console.log(data);
-
-
-                if(data.length > 0){
-
-                    const latest = data[data.length - 1];
-                    const last10Days = data.slice(-10);
-
-                    const activeDays = last10Days.filter(x => x.steps > 0).length;
-
-                    const inactiveDays = 10 - activeDays;
+            console.log("ALLE STATISTIK DATEN:");
+            console.log(data);
 
 
-                    stats = [
+            const latest = data[data.length - 1] || {};
 
-                        {
-                            id: "steps",
-                            title: t.steps,
-                            short: "S",
-                            color: "#4f46e5",
+            const last10Days = data.slice(-10);
 
-                            value: latest.steps,
+            const activeDays =
+                last10Days.filter(x => x.steps > 0).length;
 
-                            graphValues: last10Days.map(x => ({
-                                value: x.steps,
-                                date: x.stat_date
-                            })),
-                            days: `${last10Days.length}/10 Tage`,
-                            active: `${activeDays} aktiv`,
-                            extra: `${inactiveDays} nicht aktiv`
-                        
-                        },
+            const inactiveDays = 10 - activeDays;
 
 
-                        {
-                            id: "calories",
-                            title: "Kalorien",
-                            short: "K",
-                            color: "#22c55e",
+            stats = [
 
-                            value: latest.calories_burned,
+                {
+                    id: "steps",
+                    title: t.steps,
+                    short: "S",
+                    color: "#4f46e5",
 
-                            graphValues: last10Days.map(x => ({
-                                value: x.calories_burned,
-                                date: x.stat_date
-                            })),
-                            days: `${last10Days.length}/10 Tage`,
-                            active: `${activeDays} aktiv`,
-                            extra: `${inactiveDays} nicht aktiv`
-                        
-                        },
+                    value: latest.steps || 0,
 
+                    graphValues: last10Days.map(x => ({
+                        value: x.steps || 0,
+                        date: x.stat_date
+                    })),
 
-                        {
-                            id: "weight",
-                            title: t.weight,
-                            short: "G",
-                            color: "#ef4444",
-
-                            value: latest.weight_kg,
-
-                            graphValues: last10Days.map(x => ({
-                                value: x.weight_kg,
-                                date: x.stat_date
-                            })),
-
-                            days: `${last10Days.length}/10 Tage`,
-                            active: `${activeDays} aktiv`,
-                            extra: `${inactiveDays} nicht aktiv`
-                        }
-
-                    ];
+                    days: `${last10Days.length}/10 Tage`,
+                    active: `${activeDays} aktiv`,
+                    extra: `${inactiveDays} nicht aktiv`
+                },
 
 
-                    selectedStat = stats[0];
+                {
+                    id: "calories",
+                    title: "Kalorien",
+                    short: "K",
+                    color: "#22c55e",
 
+                    value: latest.calories_burned || 0,
+
+                    graphValues: last10Days.map(x => ({
+                        value: x.calories_burned || 0,
+                        date: x.stat_date
+                    })),
+
+                    days: `${last10Days.length}/10 Tage`,
+                    active: `${activeDays} aktiv`,
+                    extra: `${inactiveDays} nicht aktiv`
+                },
+
+
+                {
+                    id: "weight",
+                    title: t.weight,
+                    short: "G",
+                    color: "#ef4444",
+
+                    value: latest.weight_kg || 0,
+
+                    graphValues: last10Days.map(x => ({
+                        value: x.weight_kg || 0,
+                        date: x.stat_date
+                    })),
+
+                    days: `${last10Days.length}/10 Tage`,
+                    active: `${activeDays} aktiv`,
+                    extra: `${inactiveDays} nicht aktiv`
                 }
 
-            }catch(err){
+            ];
 
-                console.log(err);
 
-            }
+            selectedStat = stats[0];
+
+
+        }catch(err){
+
+            console.log(err);
+
+        }
 
     }
 
