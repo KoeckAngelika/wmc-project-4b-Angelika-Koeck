@@ -143,8 +143,8 @@
 						unit,
 						date: selectedDate,
 						user_id: userId,
-						steps,
-						calories
+						steps: steps || 0,
+						calories: calories || 0
 					})
 				}
 			);
@@ -180,8 +180,8 @@
 						name: activity,
 						duration,
 						repeat,
-						steps,
-						calories
+						steps: steps || 0,
+						calories: calories || 0
 					})
 				}
 			);

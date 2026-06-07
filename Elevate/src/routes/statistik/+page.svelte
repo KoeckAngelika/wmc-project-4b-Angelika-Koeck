@@ -68,13 +68,91 @@
             console.log(data);
 
 
-            const latest = data[data.length - 1] || {};
+            if(data.length === 0){
 
-            const last10Days = data.slice(-10);
+                stats = [
+
+                    {
+                        id: "steps",
+                        title: t.steps,
+                        short: "S",
+                        color: "#4f46e5",
+
+                        value: 0,
+                        graphValues: [],
+
+                        days: "0/10 Tage",
+                        active: "0 aktiv",
+                        extra: "10 nicht aktiv"
+                    },
+
+                    {
+                        id: "calories",
+                        title: "Kalorien",
+                        short: "K",
+                        color: "#22c55e",
+
+                        value: 0,
+                        graphValues: [],
+
+                        days: "0/10 Tage",
+                        active: "0 aktiv",
+                        extra: "10 nicht aktiv"
+                    },
+
+                    {
+                        id: "weight",
+                        title: t.weight,
+                        short: "G",
+                        color: "#ef4444",
+
+                        value: 0,
+                        graphValues: [],
+
+                        days: "0/10 Tage",
+                        active: "0 aktiv",
+                        extra: "10 nicht aktiv"
+                    }
+
+                ];
+
+
+                selectedStat = stats[0];
+
+                return;
+            }
+
+
+            const sortedData = data.sort(
+                (a,b) => new Date(a.stat_date) - new Date(b.stat_date)
+            );
+
+            const latest = sortedData[sortedData.length - 1];
+
+            const last10Days = sortedData.slice(-10);
+
+
+            const totalSteps = last10Days.reduce(
+                (sum, x) => sum + Number(x.steps || 0),
+                0
+            );
+
+            const totalCalories = last10Days.reduce(
+                (sum, x) => sum + Number(x.calories_burned || 0),
+                0
+            );
+
+            const startWeight = Number(user?.weight || 0);
+
+            const lostWeight = totalCalories / 7700;
+
+            const currentWeight = (
+                startWeight - lostWeight
+            ).toFixed(1);
+
 
             const activeDays =
-                last10Days.filter(x => x.steps > 0).length;
-
+	            last10Days.length;
             const inactiveDays = 10 - activeDays;
 
 
@@ -86,7 +164,7 @@
                     short: "S",
                     color: "#4f46e5",
 
-                    value: latest.steps || 0,
+                    value: totalSteps,
 
                     graphValues: last10Days.map(x => ({
                         value: x.steps || 0,
@@ -105,8 +183,7 @@
                     short: "K",
                     color: "#22c55e",
 
-                    value: latest.calories_burned || 0,
-
+                    value: totalCalories,
                     graphValues: last10Days.map(x => ({
                         value: x.calories_burned || 0,
                         date: x.stat_date
@@ -124,11 +201,17 @@
                     short: "G",
                     color: "#ef4444",
 
-                    value: latest.weight_kg || 0,
+                    value: currentWeight,
 
                     graphValues: last10Days.map(x => ({
-                        value: x.weight_kg || 0,
+
+                        value: (
+                            startWeight -
+                            (Number(x.calories_burned || 0) / 7700)
+                        ).toFixed(1),
+
                         date: x.stat_date
+
                     })),
 
                     days: `${last10Days.length}/10 Tage`,
@@ -152,7 +235,12 @@
 
     function createGraph(values){
 
-        if(!values){
+
+        if(!values || values.length === 0){
+            return [];
+        }
+
+        if(values.every(x => x.value === 0)){
             return [];
         }
 

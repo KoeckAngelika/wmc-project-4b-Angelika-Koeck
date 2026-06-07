@@ -15,9 +15,9 @@ router.get("/single/:id", (req, res) => {
 		WHERE id = ?
 	`;
 
-	db.get(sql, [id], (err, row) => {
+	db.get(sql,[id],(err,row)=>{
 
-		if(err) {
+		if(err){
 			return res.status(500).json(err);
 		}
 
@@ -34,19 +34,27 @@ router.get("/:userId/:date", (req, res) => {
 
 	const sql = `
 		SELECT
-			id,
-			title,
-			description,
-			activity_date,
-			duration_min,
-			completed,
-			steps,
-			calories_burned
-		FROM activities
+			a.id,
+			a.title,
+			a.description,
+			a.activity_date,
+			a.duration_min,
+			a.completed,
+
+			IFNULL(s.steps,0) AS steps,
+			IFNULL(s.calories_burned,0) AS calories_burned
+
+		FROM activities a
+
+		LEFT JOIN statistics s
+		ON s.user_id = a.user_id
+		AND s.stat_date = a.activity_date
+
 		WHERE
-			user_id = ?
-			AND activity_date = ?
-		ORDER BY activity_date DESC
+			a.user_id = ?
+			AND a.activity_date = ?
+
+		ORDER BY a.activity_date DESC
 	`;
 
 	db.all(sql,[userId,date],(err, rows) => {
@@ -97,8 +105,8 @@ router.post("/", (req, res) => {
 			repeat,
 			date,
 			duration,
-			steps,
-			calories,
+			steps || 0,
+			calories || 0,
 			0
 		],
 		function(err) {
@@ -108,8 +116,8 @@ router.post("/", (req, res) => {
 			}
 
 			res.json({
-				success: true,
-				id: this.lastID
+				success:true,
+				id:this.lastID
 			});
 
 		}
@@ -117,85 +125,106 @@ router.post("/", (req, res) => {
 
 });
 
-router.patch("/:id/toggle", (req, res) => {
+router.patch("/:id/toggle", (req,res)=>{
 
 	const id = req.params.id;
 
-	// activity holen
-	db.get(
+
+	// 1. Activity abhaken / enthaken
+	db.run(
 		`
-		SELECT *
-		FROM activities
+		UPDATE activities
+		SET completed = NOT completed
 		WHERE id = ?
 		`,
 		[id],
-		(err, activity) => {
+		(err)=>{
 
-			if(err) {
+			if(err){
 				return res.status(500).json(err);
 			}
 
-			if(!activity) {
-				return res.status(404).json({
-					error: "Activity not found"
-				});
-			}
 
-			// completed toggeln
-			db.run(
+			// 2. Activity holen (wegen User + Datum)
+			db.get(
 				`
-				UPDATE activities
-				SET completed = NOT completed
+				SELECT *
+				FROM activities
 				WHERE id = ?
 				`,
 				[id],
-				function(err) {
+				(err,activity)=>{
 
-					if(err) {
+					if(err){
 						return res.status(500).json(err);
 					}
 
-					// nur wenn task gerade abgeschlossen wurde
-					if(activity.completed === 0) {
 
-						const today = activity.activity_date;
+					// 3. Statistik für diesen Tag neu setzen
+					db.run(
+						`
+						INSERT INTO statistics(
+							user_id,
+							stat_date,
+							steps,
+							calories_burned
+						)
 
-						// statistik updaten
-						db.run(
-							`
-							INSERT INTO statistics (
-								user_id,
-								stat_date,
-								steps,
-								calories_burned
+						VALUES(
+
+							?,
+							?,
+
+							(
+								SELECT IFNULL(SUM(steps),0)
+								FROM activities
+								WHERE
+									user_id = ?
+									AND activity_date = ?
+									AND completed = 1
+							),
+
+							(
+								SELECT IFNULL(SUM(calories_burned),0)
+								FROM activities
+								WHERE
+									user_id = ?
+									AND activity_date = ?
+									AND completed = 1
 							)
-							VALUES (?, ?, ?, ?)
+						)
 
-							ON CONFLICT(user_id, stat_date)
-							DO UPDATE SET
-								steps = steps + excluded.steps,
-								calories_burned = calories_burned + excluded.calories_burned
-							`,
-							[
-								activity.user_id,
-								today,
-								activity.steps,
-								activity.calories_burned
-							],
-							(err) => {
 
-								if(err) {
-									console.log(err);
-								}
+						ON CONFLICT(user_id, stat_date)
 
+						DO UPDATE SET
+
+							steps = excluded.steps,
+							calories_burned = excluded.calories_burned
+						`,
+						[
+							activity.user_id,
+							activity.activity_date,
+
+							activity.user_id,
+							activity.activity_date,
+
+							activity.user_id,
+							activity.activity_date
+						],
+						(err)=>{
+
+							if(err){
+								return res.status(500).json(err);
 							}
-						);
 
-					}
 
-					res.json({
-						success: true
-					});
+							res.json({
+								success:true
+							});
+
+						}
+					);
 
 				}
 			);
@@ -204,6 +233,7 @@ router.patch("/:id/toggle", (req, res) => {
 	);
 
 });
+
 
 router.delete("/:id", (req, res) => {
 
@@ -241,7 +271,10 @@ router.put("/:id", (req, res) => {
 		calories
 	} = req.body;
 
-	const sql = `
+
+	// 1. Aktivität ändern
+	db.run(
+		`
 		UPDATE activities
 		SET
 			title = ?,
@@ -250,10 +283,7 @@ router.put("/:id", (req, res) => {
 			steps = ?,
 			calories_burned = ?
 		WHERE id = ?
-	`;
-
-	db.run(
-		sql,
+		`,
 		[
 			name,
 			repeat,
@@ -262,14 +292,14 @@ router.put("/:id", (req, res) => {
 			calories || 0,
 			id
 		],
-		function(err) {
+		(err) => {
 
-			if(err) {
+			if(err){
 				return res.status(500).json(err);
 			}
 
 			res.json({
-				success: true
+				success:true
 			});
 
 		}
