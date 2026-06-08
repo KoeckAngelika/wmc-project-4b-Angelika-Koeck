@@ -27,7 +27,7 @@
 
     $effect(() => {
 
-        if(userId && t){
+        if(userId){
             loadStats();
         }
 
@@ -47,8 +47,65 @@
 
     let mobileMenu = $state(false);
 
-    let stats = $state([]);
-    let selectedStat = $state(null);
+    let stats = $state([
+
+        {
+            id: "steps",
+            title: "Schritte",
+            short: "S",
+            color: "#4f46e5",
+
+            value: 0,
+
+            graphValues: Array.from({ length: 10 }, (_, i) => ({
+                value: 0,
+                date: `Tag ${i + 1}`
+            })),
+
+            days: "0/10 Tage",
+            active: "0 aktiv",
+            extra: "10 nicht aktiv"
+        },
+
+        {
+            id: "calories",
+            title: "Kalorien",
+            short: "K",
+            color: "#22c55e",
+
+            value: 0,
+
+            graphValues: Array.from({ length: 10 }, (_, i) => ({
+                value: 0,
+                date: `Tag ${i + 1}`
+            })),
+
+            days: "0/10 Tage",
+            active: "0 aktiv",
+            extra: "10 nicht aktiv"
+        },
+
+        {
+            id: "weight",
+            title: "Gewicht",
+            short: "G",
+            color: "#ef4444",
+
+            value: 0,
+
+            graphValues: Array.from({ length: 10 }, (_, i) => ({
+                value: 0,
+                date: `Tag ${i + 1}`
+            })),
+
+            days: "0/10 Tage",
+            active: "0 aktiv",
+            extra: "10 nicht aktiv"
+        }
+
+    ]);
+
+    let selectedStat = $state(stats[0]);
     let graphPoints = $state('');
     let hoverPoint = $state(null);
 
@@ -67,8 +124,21 @@
             console.log("ALLE STATISTIK DATEN:");
             console.log(data);
 
+            if(!Array.isArray(data)){
+
+                console.log("Keine Statistik vorhanden");
+
+                return;
+
+            }
+
 
             if(data.length === 0){
+
+                const emptyGraph = Array.from({ length: 10 }, (_, i) => ({
+                    value: 0,
+                    date: `Tag ${i + 1}`
+                }));
 
                 stats = [
 
@@ -79,7 +149,7 @@
                         color: "#4f46e5",
 
                         value: 0,
-                        graphValues: [],
+                        graphValues: emptyGraph,
 
                         days: "0/10 Tage",
                         active: "0 aktiv",
@@ -93,7 +163,7 @@
                         color: "#22c55e",
 
                         value: 0,
-                        graphValues: [],
+                        graphValues: emptyGraph,
 
                         days: "0/10 Tage",
                         active: "0 aktiv",
@@ -107,7 +177,7 @@
                         color: "#ef4444",
 
                         value: 0,
-                        graphValues: [],
+                        graphValues: emptyGraph,
 
                         days: "0/10 Tage",
                         active: "0 aktiv",
@@ -116,12 +186,14 @@
 
                 ];
 
+                const current = selectedStat?.id || "steps";
 
-                selectedStat = stats[0];
+                selectedStat = stats.find(
+                    x => x.id === current
+                );
 
                 return;
             }
-
 
             const sortedData = data.sort(
                 (a,b) => new Date(a.stat_date) - new Date(b.stat_date)
@@ -142,13 +214,9 @@
                 0
             );
 
-            const startWeight = Number(user?.weight || 0);
-
-            const lostWeight = totalCalories / 7700;
-
-            const currentWeight = (
-                startWeight - lostWeight
-            ).toFixed(1);
+            const lostWeight = Math.round(
+                (totalCalories / 7700) * 1000
+            );
 
 
             const activeDays =
@@ -166,9 +234,17 @@
 
                     value: totalSteps,
 
-                    graphValues: last10Days.map(x => ({
-                        value: x.steps || 0,
+                    graphValues: last10Days.map((x,index) => ({
+
+                        value: last10Days
+                            .slice(0,index + 1)
+                            .reduce(
+                                (sum,item) => sum + Number(item.steps || 0),
+                                0
+                            ),
+
                         date: x.stat_date
+
                     })),
 
                     days: `${last10Days.length}/10 Tage`,
@@ -184,9 +260,18 @@
                     color: "#22c55e",
 
                     value: totalCalories,
-                    graphValues: last10Days.map(x => ({
-                        value: x.calories_burned || 0,
+                    graphValues: last10Days.map((x,index) => ({
+
+                        value: last10Days
+                            .slice(0,index + 1)
+                            .reduce(
+                                (sum,item) => 
+                                    sum + Number(item.calories_burned || 0),
+                                0
+                            ),
+
                         date: x.stat_date
+
                     })),
 
                     days: `${last10Days.length}/10 Tage`,
@@ -201,18 +286,31 @@
                     short: "G",
                     color: "#ef4444",
 
-                    value: currentWeight,
+                    value: `${lostWeight} g`,
 
-                    graphValues: last10Days.map(x => ({
+                    graphValues: last10Days.map((x,index) => {
 
-                        value: (
-                            startWeight -
-                            (Number(x.calories_burned || 0) / 7700)
-                        ).toFixed(1),
+                        const caloriesUntilDay =
+                            last10Days
+                                .slice(0,index + 1)
+                                .reduce(
+                                    (sum,item) =>
+                                        sum + Number(item.calories_burned || 0),
+                                    0
+                                );
 
-                        date: x.stat_date
 
-                    })),
+                        return {
+
+                            value: Math.round(
+                                (caloriesUntilDay / 7700) * 1000
+                            ),
+
+                            date: x.stat_date
+
+                        };
+
+                    }),
 
                     days: `${last10Days.length}/10 Tage`,
                     active: `${activeDays} aktiv`,
@@ -240,7 +338,8 @@
             return [];
         }
 
-        if(values.every(x => x.value === 0)){
+
+        if(values.every(x => Number(x.value) === 0)){
             return [];
         }
 
@@ -257,7 +356,7 @@
         }
 
         if(selectedStat?.id === "weight"){
-            max = 200;
+            max = 500;
         }
 
 

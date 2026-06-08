@@ -3,47 +3,44 @@ const router = express.Router();
 
 const db = require("../db");
 
-router.get("/:userId", (req, res) => {
 
-	const userId = req.params.userId;
+router.get("/:userId", (req,res)=>{
 
-	const sql = `
-		SELECT
-			s.stat_date,
-			s.steps,
-			s.calories_burned,
-			s.water_ml,
-			s.sleep_hours,
-			s.weight_kg
+    const userId = req.params.userId;
 
-		FROM statistics s
 
-		WHERE
-			s.user_id = ?
+    const sql = `
+        SELECT
+            id,
+            user_id,
+            stat_date,
+            steps,
+            calories_burned
+        FROM statistics
+        WHERE user_id = ?
+        ORDER BY stat_date ASC
+    `;
 
-		AND EXISTS (
-			SELECT 1
-			FROM activities a
 
-			WHERE
-				a.user_id = s.user_id
-				AND a.activity_date = s.stat_date
-				AND a.completed = 1
-		)
+    db.all(sql,[userId],(err,rows)=>{
 
-		ORDER BY s.stat_date
-	`;
 
-	db.all(sql, [userId], (err, rows) => {
+        if(err){
 
-		if(err) {
-			return res.status(500).json(err);
-		}
+            console.log(err);
 
-		res.json(rows);
+            return res.status(500).json(err);
 
-	});
+        }
+
+
+        res.json(rows);
+
+
+    });
+
 
 });
+
 
 module.exports = router;

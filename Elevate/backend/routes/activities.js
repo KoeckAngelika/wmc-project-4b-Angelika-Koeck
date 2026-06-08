@@ -167,7 +167,8 @@ router.patch("/:id/toggle", (req,res)=>{
 							user_id,
 							stat_date,
 							steps,
-							calories_burned
+							calories_burned,
+							weight_kg
 						)
 
 						VALUES(
@@ -191,26 +192,53 @@ router.patch("/:id/toggle", (req,res)=>{
 									user_id = ?
 									AND activity_date = ?
 									AND completed = 1
-							)
-						)
+							),
 
+
+							(
+								SELECT ROUND(
+									
+									(
+										SELECT IFNULL(SUM(calories_burned),0)
+										FROM activities
+										WHERE
+											user_id = ?
+											AND completed = 1
+									)
+									/ 7700.0,
+
+									2
+								)
+							)
+
+						)
 
 						ON CONFLICT(user_id, stat_date)
 
 						DO UPDATE SET
 
 							steps = excluded.steps,
-							calories_burned = excluded.calories_burned
+							calories_burned = excluded.calories_burned,
+							weight_kg = excluded.weight_kg
+
 						`,
 						[
 							activity.user_id,
 							activity.activity_date,
 
+
+							// steps
 							activity.user_id,
 							activity.activity_date,
 
+
+							// calories
 							activity.user_id,
-							activity.activity_date
+							activity.activity_date,
+
+
+							// weight
+							activity.user_id
 						],
 						(err)=>{
 
@@ -298,9 +326,120 @@ router.put("/:id", (req, res) => {
 				return res.status(500).json(err);
 			}
 
-			res.json({
-				success:true
-			});
+
+			// 2. Activity wieder holen
+			db.get(
+				`
+				SELECT *
+				FROM activities
+				WHERE id = ?
+				`,
+				[id],
+				(err, activity) => {
+
+
+					if(err){
+						return res.status(500).json(err);
+					}
+
+
+					// 3. Statistik neu berechnen
+					db.run(
+						`
+						INSERT INTO statistics(
+							user_id,
+							stat_date,
+							steps,
+							calories_burned,
+							weight_kg
+						)
+
+						VALUES(
+
+							?,
+							?,
+
+							(
+								SELECT IFNULL(SUM(steps),0)
+								FROM activities
+								WHERE
+									user_id = ?
+									AND activity_date = ?
+									AND completed = 1
+							),
+
+							(
+								SELECT IFNULL(SUM(calories_burned),0)
+								FROM activities
+								WHERE
+									user_id = ?
+									AND activity_date = ?
+									AND completed = 1
+							),
+
+
+							(
+								SELECT ROUND(
+									
+									(
+										SELECT IFNULL(SUM(calories_burned),0)
+										FROM activities
+										WHERE
+											user_id = ?
+											AND completed = 1
+									)
+									/ 7700.0,
+
+									2
+								)
+							)
+
+						)
+
+						ON CONFLICT(user_id, stat_date)
+
+						DO UPDATE SET
+
+							steps = excluded.steps,
+							calories_burned = excluded.calories_burned,
+							weight_kg = excluded.weight_kg
+
+						`,
+						[
+							activity.user_id,
+							activity.activity_date,
+
+
+							// steps
+							activity.user_id,
+							activity.activity_date,
+
+
+							// calories
+							activity.user_id,
+							activity.activity_date,
+
+
+							// weight
+							activity.user_id
+						],
+						(err)=>{
+
+							if(err){
+								return res.status(500).json(err);
+							}
+
+
+							res.json({
+								success:true
+							});
+
+						}
+					);
+
+
+				}
+			);
 
 		}
 	);
