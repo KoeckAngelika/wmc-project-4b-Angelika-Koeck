@@ -146,4 +146,72 @@ router.post("/login", (req, res) => {
 
 });
 
+router.patch("/reset-password", (req,res)=>{
+
+    const {
+        username,
+        newPassword
+    } = req.body;
+
+
+    const sql = `
+        SELECT *
+        FROM users
+        WHERE username = ?
+    `;
+
+
+    db.get(sql,[username], async (err,user)=>{
+
+
+        if(err){
+            return res.status(500).json(err);
+        }
+
+
+        if(!user){
+
+            return res.status(404).json({
+                message:"Benutzer nicht gefunden"
+            });
+
+        }
+
+
+        const hashedPassword = await bcrypt.hash(
+            newPassword,
+            10
+        );
+
+
+        db.run(
+            `
+            UPDATE users
+            SET password_hash = ?
+            WHERE username = ?
+            `,
+            [
+                hashedPassword,
+                username
+            ],
+            (err)=>{
+
+
+                if(err){
+                    return res.status(500).json(err);
+                }
+
+
+                res.json({
+                    success:true,
+                    message:"Passwort geändert"
+                });
+
+            }
+        );
+
+    });
+
+});
+
 module.exports = router;
